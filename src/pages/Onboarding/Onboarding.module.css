@@ -1,0 +1,124 @@
+/* src/pages/Onboarding/Onboarding.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background-color: #FFF0F5; /* Light pastel pink background for the image area */
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Top Section (Image) --- */
+.imageSection {
+  flex: 1; /* Takes up remaining space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 2rem; /* Give space for the overlapping card */
+  z-index: 1;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 80%;
+  object-fit: contain;
+  /* subtle floating animation */
+  animation: float 6s ease-in-out infinite;
+}
+
+/* --- Bottom Card Section --- */
+.card {
+  background-color: #ffffff;
+  width: 100%;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0px -10px 30px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  
+  /* Ensure it sits at the bottom */
+  position: relative; 
+  min-height: 40%; /* Adjust based on content */
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 15px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  padding: 0 10px;
+}
+
+/* --- Indicators (The dots) --- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: #E0E0E0;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.activeDot {
+  /* To match your image's unique "vertical pill" style, use height > width */
+  height: 16px; 
+  width: 6px;
+  background-color: #FF4B6E; /* Hot Pink */
+  border-radius: 10px;
+}
+
+/* Alternate: If you prefer the standard horizontal pill */
+/* .activeDot {
+  width: 20px;
+  height: 6px;
+  background-color: #FF4B6E;
+  border-radius: 10px;
+} 
+*/
+
+/* --- Button --- */
+.nextButton {
+  width: 100%;
+  padding: 18px;
+  background-color: #F64A77; /* The specific pink from your UI */
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 10px 20px rgba(246, 74, 119, 0.2);
+}
+
+.nextButton:active {
+  transform: scale(0.98);
+  background-color: #d63a63;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
