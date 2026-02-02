@@ -1,29 +1,47 @@
-/* src/App.css */
-
-/* In src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-
-
 :root {
-  --primary-color: #ff4b6e; /* Rose */
-  --secondary-color: #ff9e42; /* Orange */
+  --primary-color: #ff4b6e;
+  --secondary-color: #ff9e42;
   --bg-color: #ffffff;
   --text-dark: #333333;
   --text-light: #888888;
   --white: #ffffff;
-  --font-family: 'Inter', sans-serif;
+  --font-family: 'Poppins', sans-serif;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  
+  /* 1. Hide scrollbar for Firefox */
+  scrollbar-width: none !important; 
+  
+  /* 2. Hide scrollbar for IE/Edge */
+  -ms-overflow-style: none !important; 
+}
+
+/* 3. Hide scrollbar for Chrome, Safari, and Opera */
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  background: transparent !important;
 }
 
 body {
-   font-family: 'Poppins', sans-serif;
+  font-family: var(--font-family);
+  background-color: #f5f5f5;
+  overflow: hidden; /* Prevents the main window from scrolling */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  background-color: #f5f5f5; /* Light grey for desktop background */
-  overflow: hidden; /* Prevent scroll on splash */
+/* Utility class if you need to force it specifically on a div */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

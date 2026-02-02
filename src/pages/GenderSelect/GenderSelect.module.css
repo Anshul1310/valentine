@@ -1,0 +1,125 @@
+/* src/pages/GenderSelect/GenderSelect.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 24px;
+  background-color: #fff;
+  font-family: 'Poppins', sans-serif;
+  justify-content: space-between;
+}
+
+.header {
+  margin-top: 40px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* --- The Grid of Gender Cards --- */
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+  flex: 1; /* Pushes footer down */
+}
+
+.genderCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border: 2px solid #F0F0F0;
+  border-radius: 16px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: none;
+}
+
+.genderCard:active {
+  transform: scale(0.98);
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.checkIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #E0E0E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* --- Selected State --- */
+.selected {
+  border-color: #FF4B6E; /* Brand Pink */
+  background-color: #FFF0F3; /* Light Pink tint */
+  box-shadow: 0 4px 12px rgba(255, 75, 110, 0.15);
+}
+
+.selected .label {
+  color: #FF4B6E;
+}
+
+.selected .checkIcon {
+  background-color: #FF4B6E;
+  border-color: #FF4B6E;
+  color: white;
+}
+
+.checkIcon::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0;
+}
+
+.selected .checkIcon::after {
+  opacity: 1;
+}
+
+/* --- Footer Button --- */
+.nextButton {
+  width: 100%;
+  padding: 18px;
+  background-color: #E0E0E0;
+  color: #A0A0A0;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: not-allowed;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 20px;
+}
+
+.activeButton {
+  background-color: #FF4B6E;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(255, 75, 110, 0.3);
+}
+
+.activeButton:active {
+  transform: scale(0.98);
+}

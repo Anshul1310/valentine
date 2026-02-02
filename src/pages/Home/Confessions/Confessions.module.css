@@ -1,0 +1,191 @@
+/* src/pages/Home/Confessions/Confessions.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f9f9f9; /* Light grey background for feed contrast */
+  font-family: 'Poppins', sans-serif;
+}
+
+/* --- Header Section --- */
+.header {
+  padding: 20px 20px 15px;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* --- Create Post Box --- */
+.createPostContainer {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  display: flex;
+  gap: 15px;
+}
+
+.currentUserAvatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FF4B6E;
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
+.textArea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  color: #333;
+  outline: none;
+  min-height: 60px;
+}
+
+.textArea::placeholder {
+  color: #aaa;
+}
+
+.postActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.postButton {
+  background: linear-gradient(90deg, #FF4B6E, #FF9E42);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  box-shadow: 0 4px 10px rgba(255, 75, 110, 0.2);
+}
+
+.postButton:disabled {
+  background: #e0e0e0;
+  color: #aaa;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.postButton:active {
+  transform: scale(0.95);
+}
+
+/* --- Feed Section --- */
+.feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 15px 100px; /* Padding for bottom nav */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  /* Hide Scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.feed::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Confession Card --- */
+.card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: slideUp 0.3s ease-out;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.cardAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.cardTime {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.cardBody {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #f9f9f9;
+  padding-top: 12px;
+  gap: 20px;
+}
+
+.actionIcon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.actionIcon:hover {
+  color: #FF4B6E;
+}
+
+.liked {
+  color: #FF4B6E;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
