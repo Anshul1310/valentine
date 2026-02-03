@@ -8,6 +8,7 @@ import AuthCallback from './pages/AuthCallback';
 import Login from './pages/Login/Login';
 import GenderSelect from './pages/GenderSelect/GenderSelect';
 import Home from './pages/Home/Home';
+import Chat from './pages/Chat/Chat';
 
 // ... inside <Routes>
 
@@ -19,6 +20,7 @@ function App() {
           {/* The Splash handles the initial logic */}
           <Route path="/" element={<Splash />} />
           <Route path="/login" element={<Login />} />
+           <Route path="/chat" element={<Chat />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/questions" element={<Questions />} />
           <Route path="/gender" element={<GenderSelect />} />
