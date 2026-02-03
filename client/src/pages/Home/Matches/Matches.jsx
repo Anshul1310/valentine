@@ -1,107 +1,165 @@
-// src/pages/Home/Matches/Matches.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './Matches.module.css';
 
-// Mock Data - In real app, this comes from backend
-const MOCK_DATA = [
-  { id: 1, name: 'Sanya', age: 20, matchCount: 9, img: 'https://i.pravatar.cc/300?u=sanya', common: ['Serious Relationship', 'Likes Coding', 'Night Owl'] },
-  { id: 2, name: 'Rohan', age: 21, matchCount: 4, img: 'https://i.pravatar.cc/300?u=rohan', common: ['Casual Dating'] },
-  { id: 3, name: 'Aditi', age: 19, matchCount: 7, img: 'https://i.pravatar.cc/300?u=aditi', common: ['Travel', 'Music', 'Dog Lover'] },
-  { id: 4, name: 'Vikram', age: 22, matchCount: 2, img: 'https://i.pravatar.cc/300?u=vikram', common: ['Gym'] },
-  { id: 5, name: 'Priya', age: 20, matchCount: 6, img: 'https://i.pravatar.cc/300?u=priya', common: ['Art', 'Coffee'] },
-  { id: 6, name: 'Karan', age: 21, matchCount: 8, img: 'https://i.pravatar.cc/300?u=karan', common: ['Startup', 'React', 'Movies'] },
-  { id: 7, name: 'Neha', age: 19, matchCount: 3, img: 'https://i.pravatar.cc/300?u=neha', common: ['Reading'] },
-  { id: 8, name: 'Arjun', age: 23, matchCount: 5, img: 'https://i.pravatar.cc/300?u=arjun', common: ['Gaming', 'Pizza'] },
-  { id: 9, name: 'Simran', age: 20, matchCount: 1, img: 'https://i.pravatar.cc/300?u=simran', common: [] },
-  { id: 10, name: 'Dev', age: 21, matchCount: 7, img: 'https://i.pravatar.cc/300?u=dev', common: ['Cricket', 'Tech'] },
-];
+const QUESTION_MAP = {
+  2: "Ideal First Date",
+  4: "One thing I can't live without"
+};
 
 const Matches = () => {
+  const [recommendations, setRecommendations] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]); // <--- New State
+  const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // 1. Sort matches: Highest matches first
-  const sortedMatches = [...MOCK_DATA].sort((a, b) => b.matchCount - a.matchCount);
+  useEffect(() => {
+    fetchMatches();
+  }, []);
 
-  // Helper to get badge color styling
-  const getBadgeStyle = (count) => {
-    if (count >= 7) return styles.highMatch; // Green
-    if (count >= 4) return styles.medMatch;  // Orange
-    return styles.lowMatch;                  // Grey
+  const fetchMatches = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await axios.get('http://localhost:5000/api/user/matches', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRecommendations(res.data.recommendations);
+      setSentRequests(res.data.sent); // <--- Store Sent Requests
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching matches", error);
+      setLoading(false);
+    }
   };
+
+  const handleSendInvite = async () => {
+    if (!selectedUser) return;
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.post(`http://localhost:5000/api/user/invite/${selectedUser._id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Update UI: Move from Recommendations to Sent Requests
+      setSentRequests(prev => [...prev, selectedUser]);
+      setRecommendations(prev => prev.filter(u => u._id !== selectedUser._id));
+      
+      alert(`Invite sent to ${selectedUser.name}! 💌`);
+      setSelectedUser(null);
+    } catch (error) {
+      alert("Failed to send invite.");
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>Finding Cupid... 💘</div>;
 
   return (
     <div className={styles.container}>
       
-      {/* Header */}
-      <div className={styles.header}>
-        <h1 className={styles.title}>Your Matches</h1>
-        <p className={styles.subtitle}>Sorted by compatibility score</p>
-      </div>
-
-      {/* List */}
-      <div className={styles.matchList}>
-        {sortedMatches.map((user, index) => {
-          const isTopMatch = index === 0; // First item gets special styling
-
-          return (
-            <div 
-              key={user.id} 
-              className={`${styles.card} ${isTopMatch ? styles.topMatch : ''}`}
-              onClick={() => setSelectedUser(user)}
-            >
-              <img src={user.img} alt={user.name} className={styles.avatar} />
-              
-              <div className={styles.info}>
-                <div className={styles.name}>{user.name}, {user.age}</div>
-                {/* Custom Badge Logic */}
-                <div 
-                  className={styles.matchBadge}
-                  style={!isTopMatch ? { backgroundColor: getBadgeStyle(user.matchCount).backgroundColor } : {}}
-                >
-                  {user.matchCount}/10 Answers Matched
+      {/* --- SECTION 1: Pending Approval (Sent Requests) --- */}
+      {sentRequests.length > 0 && (
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>⏳ Pending Approval</h3>
+          <p className={styles.subtitle}>People you have applied to.</p>
+          
+          <div className={styles.pendingList}>
+            {sentRequests.map(user => (
+              <div key={user._id} className={styles.pendingCard}>
+                <div className={styles.avatar}>
+                  {user.gender === 'Man' ? '👨' : '👩'}
+                </div>
+                <div className={styles.info}>
+                  <h4>{user.name}</h4>
+                  <span className={styles.statusTag}>Waiting for response...</span>
                 </div>
               </div>
-
-              {/* Special Crown for #1 */}
-              {isTopMatch && <div className={styles.crownLabel}>👑 Best Match</div>}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Dialog Modal */}
-      {selectedUser && (
-        <div className={styles.overlay} onClick={() => setSelectedUser(null)}>
-          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setSelectedUser(null)}>×</button>
-            
-            <img src={selectedUser.img} alt={selectedUser.name} className={styles.dialogAvatar} />
-            <h2 className={styles.dialogName}>{selectedUser.name}, {selectedUser.age}</h2>
-            <p className={styles.dialogMeta}>🔥 {selectedUser.matchCount} Common Interests</p>
-
-            <div className={styles.commonAnswers}>
-              <p style={{marginBottom: '10px', fontWeight: '600', fontSize: '12px', color: '#888'}}>YOU BOTH LIKED:</p>
-              {selectedUser.common.length > 0 ? (
-                selectedUser.common.map((answer, i) => (
-                  <div key={i} className={styles.answerItem}>
-                    <span className={styles.check}>✓</span> {answer}
-                  </div>
-                ))
-              ) : (
-                <p className={styles.answerItem}>No specific tags, but the vibe matched!</p>
-              )}
-            </div>
-
-            <button 
-              className={styles.inviteBtn}
-              onClick={() => alert(`Invite sent to ${selectedUser.name}!`)}
-            >
-              Send Invite to Chat 💌
-            </button>
+            ))}
           </div>
         </div>
       )}
 
+      {/* --- SECTION 2: Recommendations --- */}
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Find Your Spark ✨</h3>
+        <p className={styles.subtitle}>People with similar vibes as you.</p>
+
+        <div className={styles.matchList}>
+          {recommendations.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No new profiles right now. Come back later!</p>
+            </div>
+          ) : (
+            recommendations.map((match, index) => (
+              <div key={match._id} className={styles.matchCard}>
+                {index === 0 && <div className={styles.crown}>👑 Top Pick</div>}
+                
+                <div className={styles.cardHeader}>
+                  <div className={styles.matchAvatar}>
+                    {match.gender === 'Man' ? '👨' : '👩'}
+                  </div>
+                  <div className={styles.matchScore}>
+                    {match.matchCount} Common Tags
+                  </div>
+                </div>
+
+                <div className={styles.cardBody}>
+                  <h3>{match.name}</h3>
+                  <div className={styles.tags}>
+                    {match.commonInterests.map((tag, i) => (
+                      <span key={i} className={styles.pill}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <button 
+                  className={styles.inviteButton}
+                  onClick={() => setSelectedUser(match)}
+                >
+                  View Profile
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* --- DIALOG BOX --- */}
+      {selectedUser && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedUser(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalAvatar}>
+                {selectedUser.gender === 'Man' ? '👨' : '👩'}
+              </div>
+              <h2>{selectedUser.name}</h2>
+              <p>Send an invitation to chat?</p>
+            </div>
+
+            <div className={styles.modalBody}>
+              <h4 className={styles.detailsTitle}>The Vibe Check</h4>
+              {selectedUser.answers.filter(a => a.questionType === 'text').length > 0 ? (
+                selectedUser.answers
+                  .filter(a => a.questionType === 'text')
+                  .map((ans, i) => (
+                    <div key={i} className={styles.qnaBlock}>
+                      <p className={styles.qLabel}>{QUESTION_MAP[ans.questionId] || "Question"}</p>
+                      <p className={styles.qAnswer}>"{ans.textAnswer}"</p>
+                    </div>
+                  ))
+              ) : (
+                <p className={styles.noInfo}>This user is a mystery... no bio written.</p>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button className={styles.cancelBtn} onClick={() => setSelectedUser(null)}>Cancel</button>
+              <button className={styles.confirmBtn} onClick={handleSendInvite}>
+                Send Invite 💌
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

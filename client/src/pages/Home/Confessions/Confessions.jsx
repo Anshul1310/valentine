@@ -1,134 +1,201 @@
-// src/pages/Home/Confessions/Confessions.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './Confessions.module.css';
 
-// Mock Data for initial feed
-const INITIAL_CONFESSIONS = [
-  {
-    id: 1,
-    name: "Riya",
-    avatar: "https://api.dicebear.com/9.x/adventurer/svg?seed=Riya",
-    text: "I still check my ex's Spotify playlists to see if they are sad. Is that toxic? 😅",
-    time: "20 mins ago",
-    likes: 12
-  },
-  {
-    id: 2,
-    name: "Aryan",
-    avatar: "https://api.dicebear.com/9.x/adventurer/svg?seed=Aryan&flip=true",
-    text: "Honestly, I just want someone to eat momos with at 2 AM. That's the dream.",
-    time: "4 hours ago",
-    likes: 45
-  },
-  {
-    id: 3,
-    name: "Sneha",
-    avatar: "https://api.dicebear.com/9.x/adventurer/svg?seed=Sneha",
-    text: "I told my date I love hiking. I have never hiked in my life. Someone help me.",
-    time: "Yesterday",
-    likes: 8
-  }
-];
-
 const Confessions = () => {
-  const [feed, setFeed] = useState(INITIAL_CONFESSIONS);
-  const [newPost, setNewPost] = useState("");
+  const [confessions, setConfessions] = useState([]);
+  const [newConfession, setNewConfession] = useState("");
+  const [quota, setQuota] = useState(0);
+  const [loading, setLoading] = useState(true);
   
-  // Current User (You)
-  const myProfile = {
-    name: "You",
-    avatar: "https://api.dicebear.com/9.x/adventurer/svg?seed=Anshul&flip=true" // Replace with actual user avatar
+  const [openComments, setOpenComments] = useState({});
+  const [commentInputs, setCommentInputs] = useState({});
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const [feedRes, quotaRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/confessions', { headers }),
+        axios.get('http://localhost:5000/api/confessions/quota', { headers })
+      ]);
+
+      setConfessions(feedRes.data);
+      setQuota(quotaRes.data.remaining);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data", error);
+      setLoading(false);
+    }
   };
 
-  const handlePost = () => {
-    if (!newPost.trim()) return;
+  const handlePost = async () => {
+    if (!newConfession.trim()) return;
+    if (quota <= 0) return alert("Quota exceeded! Come back tomorrow. 🌙");
 
-    const post = {
-      id: Date.now(),
-      name: myProfile.name,
-      avatar: myProfile.avatar,
-      text: newPost,
-      time: "Just now",
-      likes: 0
-    };
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.post('http://localhost:5000/api/confessions', 
+        { content: newConfession },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    setFeed([post, ...feed]); // Add new post to top
-    setNewPost(""); // Clear input
+      setNewConfession("");
+      fetchData(); // Refresh list & quota
+    } catch (error) {
+      alert("Failed to post confession.");
+    }
   };
 
-  const handleLike = (id) => {
-    setFeed(feed.map(item => 
-      item.id === id ? { ...item, likes: item.likes + 1, liked: true } : item
-    ));
+  const handleLike = async (id) => {
+    // Optimistic UI Update (Instant Feedback)
+    setConfessions(prev => prev.map(post => {
+      if (post._id === id) {
+        return {
+          ...post,
+          isLikedByMe: !post.isLikedByMe,
+          likesCount: post.isLikedByMe ? post.likesCount - 1 : post.likesCount + 1
+        };
+      }
+      return post;
+    }));
+
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.put(`http://localhost:5000/api/confessions/${id}/like`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Background refresh to ensure sync
+      fetchData();
+    } catch (error) {
+      console.error("Like failed");
+    }
   };
+
+  const handleComment = async (id) => {
+    const text = commentInputs[id];
+    if (!text?.trim()) return;
+
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.post(`http://localhost:5000/api/confessions/${id}/comment`, 
+        { text },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      fetchData();
+    } catch (error) {
+      console.error("Comment failed");
+    }
+  };
+
+  const toggleComments = (id) => {
+    setOpenComments(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  if (loading) return <div className={styles.loading}>Loading Secrets... 🤫</div>;
 
   return (
     <div className={styles.container}>
-      
-      {/* 1. Header */}
+      {/* Sticky Glass Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Confessions</h1>
-        <p className={styles.subtitle}>Share your secrets or random thoughts 🤫</p>
-      </div>
-
-      {/* 2. Create Post Input */}
-      <div className={styles.createPostContainer}>
-        <img src={myProfile.avatar} alt="You" className={styles.currentUserAvatar} />
-        <div className={styles.inputWrapper}>
-          <textarea
-            className={styles.textArea}
-            placeholder="What's on your mind?"
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-          />
-          <div className={styles.postActions}>
-            <button 
-              className={styles.postButton} 
-              disabled={!newPost.trim()}
-              onClick={handlePost}
-            >
-              Post
-            </button>
-          </div>
+        <h1 className={styles.title}>Confessions 🎭</h1>
+        <div className={styles.quotaBox}>
+          <span className={styles.quotaCount}>{quota}</span>
+          <span className={styles.quotaLabel}>Left Today</span>
         </div>
       </div>
 
-      {/* 3. The Feed */}
+      {/* Input Section */}
+      <div className={styles.inputCard}>
+        <textarea
+          className={styles.textarea}
+          placeholder={quota > 0 ? "What's on your mind? (Anonymous)" : "You've reached your daily limit. Read & Support others! ❤️"}
+          value={newConfession}
+          onChange={(e) => setNewConfession(e.target.value)}
+          disabled={quota === 0}
+          maxLength={500}
+        />
+        <div className={styles.inputFooter}>
+          <span className={styles.charCount}>{newConfession.length}/500</span>
+          <button 
+            className={styles.postButton} 
+            onClick={handlePost}
+            disabled={!newConfession.trim() || quota === 0}
+          >
+            Confess It
+          </button>
+        </div>
+      </div>
+
+      {/* Feed Section */}
       <div className={styles.feed}>
-        {feed.map((item) => (
-          <div key={item.id} className={styles.card}>
+        {confessions.map((post) => (
+          <div key={post._id} className={styles.card}>
+            <p className={styles.content}>{post.content}</p>
             
-            {/* Card Header: Profile Info */}
-            <div className={styles.cardHeader}>
-              <img src={item.avatar} alt={item.name} className={styles.cardAvatar} />
-              <div className={styles.cardMeta}>
-                <span className={styles.cardName}>{item.name}</span>
-                <span className={styles.cardTime}>{item.time}</span>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className={styles.cardBody}>
-              {item.text}
-            </div>
-
-            {/* Footer: Likes */}
-            <div className={styles.cardFooter}>
-              <div 
-                className={`${styles.actionIcon} ${item.liked ? styles.liked : ''}`}
-                onClick={() => handleLike(item.id)}
+            <div className={styles.actions}>
+              <button 
+                className={`${styles.actionBtn} ${post.isLikedByMe ? styles.liked : ''}`}
+                onClick={() => handleLike(post._id)}
               >
-                {item.liked ? '❤️' : '🤍'} {item.likes} Likes
-              </div>
-              <div className={styles.actionIcon}>
-                💬 Reply
-              </div>
+                <span className={styles.heartIcon}>{post.isLikedByMe ? '❤️' : '🤍'}</span> 
+                {post.likesCount}
+              </button>
+              
+              <button 
+                className={styles.actionBtn}
+                onClick={() => toggleComments(post._id)}
+              >
+                💬 {post.commentsCount}
+              </button>
             </div>
 
+            {/* Comments Section */}
+            {openComments[post._id] && (
+              <div className={styles.commentSection}>
+                <div className={styles.commentList}>
+                  {post.comments.length === 0 ? (
+                    <p className={styles.noComments}>No comments yet. Be the first! 👇</p>
+                  ) : (
+                    post.comments.map((comment, i) => (
+                      <div key={i} className={styles.commentBubble}>
+                        <span className={styles.commentAuthor}>
+                          {comment.author?.gender === 'Man' ? '👦' : '👧'} {comment.author?.name}:
+                        </span>
+                        <span className={styles.commentText}>{comment.text}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className={styles.commentInputBox}>
+                  <input
+                    type="text"
+                    className={styles.commentInput}
+                    placeholder="Write a supportive comment..."
+                    value={commentInputs[post._id] || ""}
+                    onChange={(e) => setCommentInputs({ ...commentInputs, [post._id]: e.target.value })}
+                    onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
+                  />
+                  <button 
+                    className={styles.sendCommentBtn}
+                    onClick={() => handleComment(post._id)}
+                  >
+                    ➤
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
-
     </div>
   );
 };

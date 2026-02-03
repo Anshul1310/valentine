@@ -1,157 +1,126 @@
-// src/pages/Home/Invitations/Invitations.jsx
-import { useState } from 'react';
-import styles from './Invitations.module.css';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import styles from './Invitations.module.css'; // Uses same/similar styling
 
-// Mock Data: Incoming Invitations
-const MOCK_INVITES = [
-  { 
-    id: 101, 
-    name: 'Aarav', 
-    age: 21, 
-    img: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Aarav&flip=true',
-    sentTime: '2 hrs ago',
-    // The 2 Descriptive Answers
-    answers: [
-      { q: "My perfect Sunday involves...", a: "Coding a new side project while sipping unlimited coffee ☕" },
-      { q: "A controversial opinion I have is...", a: "Pineapple absolutely belongs on pizza. Fight me! 🍕" }
-    ]
-  },
-  { 
-    id: 102, 
-    name: 'Zara', 
-    age: 20, 
-    img: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Zara',
-    sentTime: '5 hrs ago',
-    answers: [
-      { q: "My perfect Sunday involves...", a: "Sleeping in until noon and then binge-watching anime." },
-      { q: "A controversial opinion I have is...", a: "React Native > Flutter. Any day." }
-    ]
-  },
-  { 
-    id: 103, 
-    name: 'Ishaan', 
-    age: 22, 
-    img: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Ishaan&flip=true',
-    sentTime: 'Yesterday',
-    answers: [
-      { q: "My perfect Sunday involves...", a: "Going for a long bike ride on the highway." },
-      { q: "A controversial opinion I have is...", a: "Tabs are superior to spaces." }
-    ]
-  }
-];
+const QUESTION_MAP = {
+  2: "Ideal First Date",
+  4: "One thing I can't live without"
+};
 
 const Invitations = () => {
-  const [invites, setInvites] = useState(MOCK_INVITES);
-  const [selectedInvite, setSelectedInvite] = useState(null); // For Modal
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Handle Accept
-  const handleAccept = (id) => {
-    // API Call would go here
-    alert("Invitation Accepted! You can now chat.");
-    setInvites(prev => prev.filter(inv => inv.id !== id));
-    setSelectedInvite(null);
-  };
+  useEffect(() => {
+    fetchInvitations();
+  }, []);
 
-  // Handle Decline
-  const handleDecline = (id) => {
-    if(window.confirm("Are you sure you want to decline?")) {
-      setInvites(prev => prev.filter(inv => inv.id !== id));
-      setSelectedInvite(null);
+  const fetchInvitations = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      // We reuse the same endpoint but focus on 'pending' data
+      const res = await axios.get('http://localhost:5000/api/user/matches', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPendingRequests(res.data.pending);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching invitations", error);
+      setLoading(false);
     }
   };
 
+  const handleAccept = async () => {
+    if (!selectedUser) return;
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.post(`http://localhost:5000/api/user/accept/${selectedUser._id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setPendingRequests(prev => prev.filter(u => u._id !== selectedUser._id));
+      alert("It's a Match! Go to Chat! 🎉");
+      setSelectedUser(null);
+    } catch (error) {
+      alert("Failed to accept invite.");
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>Checking mailbox... 📬</div>;
+
   return (
     <div className={styles.container}>
-      
-      {/* Header */}
-      <div className={styles.header}>
-        <h1 className={styles.title}>Invitations</h1>
-        <p className={styles.subtitle}>People who want to match with you</p>
-      </div>
+      <h3 className={styles.pageTitle}>Invitations 💌</h3>
+      <p className={styles.subtitle}>People who want to match with you.</p>
 
-      {/* List */}
       <div className={styles.list}>
-        {invites.length > 0 ? (
-          invites.map((invite) => (
-            <div key={invite.id} className={styles.card}>
-              
-              {/* Top Row: User Info */}
-              <div className={styles.cardHeader}>
-                <img src={invite.img} alt={invite.name} className={styles.avatar} />
-                <div className={styles.info}>
-                  <div className={styles.name}>{invite.name}, {invite.age}</div>
-                  <div className={styles.meta}>Sent {invite.sentTime}</div>
-                  
-                  {/* Link to Open Modal */}
-                  <button 
-                    className={styles.viewProfileBtn}
-                    onClick={() => setSelectedInvite(invite)}
-                  >
-                    📝 View Answers & Profile
-                  </button>
+        {pendingRequests.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.ghostIcon}>👻</div>
+            <p>No invitations yet.</p>
+            <span className={styles.hint}>Go to Matches to find people!</span>
+          </div>
+        ) : (
+          pendingRequests.map(user => (
+            <div key={user._id} className={styles.inviteCard}>
+              <div className={styles.row}>
+                <div className={styles.avatar}>
+                  {user.gender === 'Man' ? '👦' : '👧'}
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className={styles.actions}>
+                <div className={styles.info}>
+                  <h4>{user.name}</h4>
+                  <span>Sent you a request</span>
+                </div>
                 <button 
-                  className={`${styles.actionBtn} ${styles.declineBtn}`}
-                  onClick={() => handleDecline(invite.id)}
+                  className={styles.viewButton} 
+                  onClick={() => setSelectedUser(user)}
                 >
-                  ✖ Decline
-                </button>
-                <button 
-                  className={`${styles.actionBtn} ${styles.acceptBtn}`}
-                  onClick={() => handleAccept(invite.id)}
-                >
-                  ✔ Accept
+                  View
                 </button>
               </div>
-
             </div>
           ))
-        ) : (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📭</div>
-            <p>No pending invitations.</p>
-          </div>
         )}
       </div>
 
-      {/* --- Detail Modal (Shows Descriptive Answers) --- */ }
-      {selectedInvite && (
-        <div className={styles.overlay} onClick={() => setSelectedInvite(null)}>
-          <div className={styles.dialog} onClick={e => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setSelectedInvite(null)}>×</button>
-
-            <div className={styles.dialogHeader}>
-              <img src={selectedInvite.img} alt="Avatar" className={styles.dialogAvatar} />
-              <h2 className={styles.name}>{selectedInvite.name}, {selectedInvite.age}</h2>
+      {/* --- REUSABLE DIALOG BOX (For Accepting) --- */}
+      {selectedUser && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedUser(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalAvatar}>
+                {selectedUser.gender === 'Man' ? '👦' : '👧'}
+              </div>
+              <h2>{selectedUser.name}</h2>
+              <p>Do you want to accept their request?</p>
             </div>
 
-            {/* Render the 2 Descriptive Questions */}
-            <span className={styles.sectionLabel}>THEIR ANSWERS</span>
-            
-            {selectedInvite.answers.map((item, index) => (
-              <div key={index} className={styles.answerBox}>
-                <span className={styles.questionText}>{item.q}</span>
-                <p className={styles.answerText}>"{item.a}"</p>
-              </div>
-            ))}
+            <div className={styles.modalBody}>
+              <h4 className={styles.detailsTitle}>Their Profile</h4>
+              {selectedUser.answers.filter(a => a.questionType === 'text').length > 0 ? (
+                selectedUser.answers
+                  .filter(a => a.questionType === 'text')
+                  .map((ans, i) => (
+                    <div key={i} className={styles.qnaBlock}>
+                      <p className={styles.qLabel}>{QUESTION_MAP[ans.questionId] || "Question"}</p>
+                      <p className={styles.qAnswer}>"{ans.textAnswer}"</p>
+                    </div>
+                  ))
+              ) : (
+                <p className={styles.noInfo}>No answers provided.</p>
+              )}
+            </div>
 
-            <div className={styles.actions} style={{marginTop: '20px'}}>
-              <button 
-                className={`${styles.actionBtn} ${styles.acceptBtn}`}
-                onClick={() => handleAccept(selectedInvite.id)}
-              >
-                Accept Invite
+            <div className={styles.modalFooter}>
+              <button className={styles.cancelBtn} onClick={() => setSelectedUser(null)}>Ignore</button>
+              <button className={styles.acceptBtn} onClick={handleAccept}>
+                Accept & Chat ✅
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 };

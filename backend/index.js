@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
+const confessionRoutes=require('./routes/confessionRoutes')
 const userRoutes = require('./routes/userRoutes'); // Import user routes
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/confessions', confessionRoutes); // Mount here
 app.use('/api/user', userRoutes); // Mount user routes
 
 // Database Connection
