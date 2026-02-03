@@ -1,125 +1,87 @@
-/* src/pages/GenderSelect/GenderSelect.module.css */
-
 .container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 24px;
-  background-color: #fff;
-  font-family: 'Poppins', sans-serif;
+  padding: 2rem 1.5rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
   justify-content: space-between;
-}
-
-.header {
-  margin-top: 40px;
 }
 
 .title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 700;
-  color: #000;
-  margin-bottom: 10px;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .subtitle {
-  font-size: 16px;
-  color: #888;
-  line-height: 1.5;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 3rem;
+  text-align: left;
 }
 
-/* --- The Grid of Gender Cards --- */
-.cardContainer {
+.optionsGrid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 20px;
-  flex: 1; /* Pushes footer down */
+  gap: 1rem;
+  flex: 1; /* Pushes content to fill space */
 }
 
-.genderCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  border: 2px solid #F0F0F0;
+.optionCard {
+  background: #fff;
+  border: 2px solid #e5e5e5;
   border-radius: 16px;
-  background-color: #fff;
+  padding: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s ease;
+  text-align: left;
   outline: none;
+  width: 100%;
 }
 
-.genderCard:active {
+.optionCard:active {
   transform: scale(0.98);
 }
 
-.label {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.checkIcon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid #E0E0E0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-/* --- Selected State --- */
+/* Selected State */
 .selected {
-  border-color: #FF4B6E; /* Brand Pink */
-  background-color: #FFF0F3; /* Light Pink tint */
-  box-shadow: 0 4px 12px rgba(255, 75, 110, 0.15);
+  border-color: #ff4b6e; /* Brand Pink */
+  background-color: #fff0f3;
+  color: #ff4b6e;
 }
 
-.selected .label {
-  color: #FF4B6E;
+.footer {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
-.selected .checkIcon {
-  background-color: #FF4B6E;
-  border-color: #FF4B6E;
-  color: white;
-}
-
-.checkIcon::after {
-  content: '✓';
-  font-size: 14px;
-  font-weight: bold;
-  opacity: 0;
-}
-
-.selected .checkIcon::after {
-  opacity: 1;
-}
-
-/* --- Footer Button --- */
 .nextButton {
   width: 100%;
-  padding: 18px;
-  background-color: #E0E0E0;
-  color: #A0A0A0;
+  padding: 1rem;
   border: none;
   border-radius: 50px;
-  font-size: 16px;
+  background-color: #e5e5e5;
+  color: #a5a5a5;
+  font-size: 1rem;
   font-weight: 700;
   cursor: not-allowed;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
 }
 
-.activeButton {
-  background-color: #FF4B6E;
+/* Button Active State (When gender is selected) */
+.nextButton:not(:disabled) {
+  background-color: #ff4b6e;
   color: white;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(255, 75, 110, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
 }
 
-.activeButton:active {
+.nextButton:not(:disabled):active {
   transform: scale(0.98);
 }

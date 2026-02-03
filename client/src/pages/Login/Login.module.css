@@ -1,0 +1,162 @@
+/* --- Base Layout --- */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden; /* Clips the decorative circles */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animateIn {
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* --- Decorative Background Elements --- */
+.circleTop {
+  position: absolute;
+  top: -100px;
+  right: -50px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,75,110,0.1) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.circleBottom {
+  position: absolute;
+  bottom: -50px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,75,110,0.08) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* --- Content Wrapper --- */
+.content {
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 60%; /* Spreads content vertically */
+  opacity: 0; /* Starts hidden for animation */
+}
+
+/* --- Logo Section --- */
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.logoBg {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #fff0f3 0%, #ffeef1 100%);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 25px rgba(255, 75, 110, 0.15);
+  animation: pulse 3s infinite ease-in-out;
+}
+
+.logoEmoji {
+  font-size: 3.5rem;
+}
+
+.appName {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ff4b6e; /* Brand Pink */
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: #888;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* --- Action Section --- */
+.actionSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dauthButton {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 50px;
+  background: #1a1a1a; /* Black contrast for login */
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.dauthButton:active {
+  transform: scale(0.96);
+}
+
+.btnIcon {
+  font-size: 1.2rem;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.link {
+  color: #ff4b6e;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}

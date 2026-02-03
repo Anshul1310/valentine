@@ -1,69 +1,123 @@
-// src/pages/Questions/Questions.jsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Assuming you use react-router
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from './Questions.module.css';
 
-// 1. Placeholder Data (10 Questions)
+// Updated Data with 'type'
 const questionsData = [
   {
     id: 1,
+    type: 'selection', // Multiple Choice
     text: "What's your primary goal here?",
-    description: "This helps us show you the right people.",
+    description: "Select all that apply.",
     options: ["Serious Relationship", "Casual Dating", "Making Friends", "Not Sure Yet"]
   },
   {
     id: 2,
-    text: "What's your gender?",
-    description: "Select the one that best describes you.",
-    options: ["Man", "Woman", "Non-binary", "More"]
+    type: 'text', // Descriptive
+    text: "What's your ideal first date?",
+    description: "Describe it in a few words.",
+    placeholder: "e.g., Coffee at a quiet cafe..."
   },
   {
     id: 3,
-    text: "Who are you interested in?",
-    description: "You can change this later in settings.",
-    options: ["Men", "Women", "Everyone"]
+    type: 'selection',
+    text: "What are your interests?",
+    description: "Pick as many as you like.",
+    options: ["Music", "Sports", "Gaming", "Travel", "Food", "Art"]
   },
-  // ... Add 7 more dummy objects here for the full 10
-  { id: 4, text: "Question 4 Placeholder", description: "Description for Q4", options: ["Option A", "Option B"] },
-  { id: 5, text: "Question 5 Placeholder", description: "Description for Q5", options: ["Option A", "Option B"] },
-  { id: 6, text: "Question 6 Placeholder", description: "Description for Q6", options: ["Option A", "Option B"] },
-  { id: 7, text: "Question 7 Placeholder", description: "Description for Q7", options: ["Option A", "Option B"] },
-  { id: 8, text: "Question 8 Placeholder", description: "Description for Q8", options: ["Option A", "Option B"] },
-  { id: 9, text: "Question 9 Placeholder", description: "Description for Q9", options: ["Option A", "Option B"] },
-  { id: 10, text: "Final Question", description: "Almost done!", options: ["Yes", "No"] },
+  {
+    id: 4,
+    type: 'text',
+    text: "One thing you can't live without?",
+    description: "Be honest!",
+    placeholder: "e.g., My headphones"
+  }
 ];
 
 const Questions = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({}); // Store answers by Question ID
+  
+  // State structure: { 1: ["Option A"], 2: "My text answer" }
+  const [answers, setAnswers] = useState({}); 
   const navigate = useNavigate();
 
   const currentQuestion = questionsData[currentIndex];
-  
-  // Check if the current question has an answer selected
-  const selectedAnswer = answers[currentQuestion.id];
+  const currentAnswer = answers[currentQuestion.id];
 
+  // Handle Selection (Array)
   const handleSelect = (option) => {
+    setAnswers(prev => {
+      const existing = Array.isArray(prev[currentQuestion.id]) ? prev[currentQuestion.id] : [];
+      if (existing.includes(option)) {
+        return { ...prev, [currentQuestion.id]: existing.filter(item => item !== option) };
+      } else {
+        return { ...prev, [currentQuestion.id]: [...existing, option] };
+      }
+    });
+  };
+
+  // Handle Text Input (String)
+  const handleTextChange = (e) => {
     setAnswers(prev => ({
       ...prev,
-      [currentQuestion.id]: option
+      [currentQuestion.id]: e.target.value
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < questionsData.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      console.log("All Answers:", answers);
-      // Navigate to the next big step (e.g., Descriptive Questions or Main Feed)
-      // navigate('/description-questions'); 
+      // Submit Data
+      try {
+        const token = localStorage.getItem('authToken');
+        
+        // Transform state to backend schema
+        const formattedAnswers = questionsData.map(q => {
+          const ans = answers[q.id];
+          if (q.type === 'selection') {
+            return { 
+              questionId: q.id, 
+              questionType: 'selection', 
+              selectedOptions: ans || [] 
+            };
+          } else {
+            return { 
+              questionId: q.id, 
+              questionType: 'text', 
+              textAnswer: ans || "" 
+            };
+          }
+        });
+
+        await axios.post('http://localhost:5000/api/user/answers', 
+          { answers: formattedAnswers },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        navigate('/terms');
+
+      } catch (error) {
+        console.error("Failed to save answers", error);
+        alert("Something went wrong saving your answers.");
+      }
     }
+  };
+
+  // Helper to check if "Next" button should be enabled
+  const canProceed = () => {
+    if (currentQuestion.type === 'selection') {
+      return currentAnswer && currentAnswer.length > 0;
+    }
+    if (currentQuestion.type === 'text') {
+      return currentAnswer && currentAnswer.trim().length > 0;
+    }
+    return false;
   };
 
   return (
     <div className={styles.container}>
-      
-      {/* 1. Header: Segmented Progress Bar */}
       <div className={styles.header}>
         <div className={styles.progressBar}>
           {questionsData.map((_, index) => (
@@ -73,44 +127,50 @@ const Questions = () => {
             />
           ))}
         </div>
-        <div className={styles.headerText}>
-          <span>Step {currentIndex + 1}</span>
-          <span>{questionsData.length} Total</span>
-        </div>
       </div>
 
-      {/* 2. Main Content */}
       <div className={styles.content}>
         <h2 className={styles.questionTitle}>{currentQuestion.text}</h2>
         <p className={styles.questionDescription}>{currentQuestion.description}</p>
 
-        <div className={styles.optionsList}>
-          {currentQuestion.options.map((option, index) => (
-            <button
-              key={index}
-              className={`${styles.optionCard} ${selectedAnswer === option ? styles.selectedOption : ''}`}
-              onClick={() => handleSelect(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
+        {/* Render based on Type */}
+        {currentQuestion.type === 'selection' ? (
+          <div className={styles.optionsList}>
+            {currentQuestion.options.map((option, index) => {
+              const isSelected = Array.isArray(currentAnswer) && currentAnswer.includes(option);
+              return (
+                <button
+                  key={index}
+                  className={`${styles.optionCard} ${isSelected ? styles.selectedOption : ''}`}
+                  onClick={() => handleSelect(option)}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className={styles.textInputContainer}>
+            <textarea 
+              className={styles.textArea}
+              placeholder={currentQuestion.placeholder}
+              value={currentAnswer || ''}
+              onChange={handleTextChange}
+              rows={4}
+            />
+          </div>
+        )}
       </div>
 
-      {/* 3. Sticky Footer */}
       <div className={styles.footer}>
-        <p className={styles.disclaimer}>
-          We won't share your answer publicly.
-        </p>
         <button 
-          className={`${styles.nextButton} ${selectedAnswer ? styles.activeButton : ''}`}
-          disabled={!selectedAnswer}
+          className={`${styles.nextButton} ${canProceed() ? styles.activeButton : ''}`}
+          disabled={!canProceed()}
           onClick={handleNext}
         >
           {currentIndex === questionsData.length - 1 ? "Finish" : "Next"}
         </button>
       </div>
-
     </div>
   );
 };

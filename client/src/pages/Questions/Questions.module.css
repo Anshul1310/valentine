@@ -1,136 +1,150 @@
-/* src/pages/Questions/Questions.module.css */
-
 .container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #ffffff;
-  font-family: 'Poppins', sans-serif; /* Ensure you have this font or similar */
-  max-width: 600px; /* Good practice for mobile views on desktop */
-  margin: 0 auto;
+  background-color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* --- Top Progress Header --- */
+/* --- Header & Progress --- */
 .header {
-  padding: 10px 20px;
-  background-color: #fff;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .progressBar {
   display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 4px;
+  height: 4px;
+  width: 100%;
 }
 
 .progressSegment {
-  height: 4px;
   flex: 1;
-  background-color: #E0E0E0; /* Inactive Grey */
+  background-color: #f0f0f0;
   border-radius: 2px;
   transition: background-color 0.3s ease;
 }
 
 .activeSegment {
-  background-color: #FD5068; /* The "Tinder" Red/Pink */
+  background-color: #ff4b6e; /* Brand Pink */
 }
 
-.headerText {
-  display: flex;
-  justify-content: space-between;
-  color: #888;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 5px;
-}
-
-/* --- Scrollable Content Area --- */
+/* --- Main Content --- */
 .content {
   flex: 1;
+  padding: 1rem 1.5rem;
   overflow-y: auto;
-  padding: 20px 24px;
   display: flex;
   flex-direction: column;
 }
 
 .questionTitle {
-  font-size: 24px;
+  font-size: 2rem;
   font-weight: 700;
-  color: #111;
-  margin-bottom: 12px;
-  line-height: 1.3;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .questionDescription {
-  font-size: 15px;
-  color: #555;
-  line-height: 1.5;
-  margin-bottom: 32px;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
 }
 
-/* --- Options List --- */
+/* --- Options (Multiple Choice) --- */
 .optionsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .optionCard {
-  width: 100%;
-  padding: 18px 20px;
-  background-color: #fff;
-  border: 1.5px solid #E0E0E0; /* Default Grey Border */
-  border-radius: 12px; /* Rounded corners like screenshot */
-  font-size: 16px;
-  font-weight: 500;
-  color: #444;
+  background: #fff;
+  border: 2px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
-  outline: none;
+  width: 100%;
 }
 
 .optionCard:active {
   transform: scale(0.98);
 }
 
-/* Selected State */
 .selectedOption {
-  border-color: #FD5068;
-  color: #FD5068;
-  background-color: #fff0f3; /* Very faint pink bg */
-  font-weight: 600;
+  border-color: #ff4b6e;
+  background-color: #fff0f3;
+  color: #ff4b6e;
 }
 
-/* --- Footer / Bottom Button --- */
-.footer {
-  padding: 20px 24px 30px; /* Extra bottom padding for safe area */
+/* --- Text Input (New) --- */
+.textInputContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1.25rem;
+  font-size: 1.1rem;
+  color: #333;
+  background-color: #f8f9fa;
+  border: 2px solid #e5e5e5;
+  border-radius: 16px;
+  resize: none; /* Disable manual resize */
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.textArea:focus {
+  border-color: #ff4b6e;
   background-color: #fff;
-  border-top: 1px solid #f0f0f0;
+  box-shadow: 0 0 0 4px rgba(255, 75, 110, 0.1);
 }
 
-.disclaimer {
-  text-align: center;
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 16px;
+.textArea::placeholder {
+  color: #a5a5a5;
+}
+
+/* --- Footer --- */
+.footer {
+  padding: 1.5rem;
+  background: #fff; /* Ensure background covers content if scrolling */
 }
 
 .nextButton {
   width: 100%;
-  padding: 16px;
-  background-color: #E0E0E0; /* Disabled Grey */
-  color: #999;
+  padding: 1rem;
   border: none;
-  border-radius: 30px; /* Pill shape */
-  font-size: 16px;
+  border-radius: 50px;
+  background-color: #e5e5e5;
+  color: #a5a5a5;
+  font-size: 1rem;
   font-weight: 700;
   cursor: not-allowed;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .activeButton {
-  background-color: #FD5068; /* Active Pink */
+  background-color: #ff4b6e;
   color: white;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(253, 80, 104, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
+}
+
+.activeButton:active {
+  transform: scale(0.98);
 }

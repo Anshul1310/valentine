@@ -4,15 +4,17 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes'); // Import user routes
 
 const app = express();
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:3000' })); // Allow your frontend
+app.use(cors({ origin: 'http://localhost:3000' })); 
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes); // Mount user routes
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)

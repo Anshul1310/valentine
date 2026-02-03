@@ -1,4 +1,3 @@
-// src/pages/AuthCallback/AuthCallback.jsx
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -6,7 +5,7 @@ import axios from 'axios';
 const AuthCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const codeProcessed = useRef(false); // Prevent double-firing in React Strict Mode
+  const codeProcessed = useRef(false);
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -14,24 +13,20 @@ const AuthCallback = () => {
     if (code && !codeProcessed.current) {
       codeProcessed.current = true;
 
-      // Send code to YOUR backend
       axios.post('http://localhost:5000/api/auth/dauth', { code })
         .then((res) => {
           const { token, user } = res.data;
-          
-          // 1. Store Token
           localStorage.setItem('authToken', token);
           
-          // 2. Decide where to go
           if (user.onboardingComplete) {
-            navigate('/matching');
+            navigate('/terms');
           } else {
-            navigate('/questions');
+            // New Flow: Always go to Gender first for setup
+            navigate('/gender');
           }
         })
         .catch((err) => {
           console.error("Login Failed", err);
-          alert("Login failed! Please try again.");
           navigate('/login');
         });
     }
@@ -39,7 +34,7 @@ const AuthCallback = () => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <h2>Verifying with Delta...</h2>
+      <h2>Verifying...</h2>
     </div>
   );
 };

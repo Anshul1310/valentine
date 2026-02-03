@@ -7,7 +7,7 @@ const Terms = () => {
 
   const handleAgree = () => {
     // Navigate to the next step: Questions or Gender Select
-    navigate('/gender'); 
+    navigate('/home'); 
   };
 
   return (
