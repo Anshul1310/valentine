@@ -9,6 +9,7 @@ import Login from './pages/Login/Login';
 import GenderSelect from './pages/GenderSelect/GenderSelect';
 import Home from './pages/Home/Home';
 import Chat from './pages/Chat/Chat';
+import Terms from './pages/Terms/Terms';
 
 // ... inside <Routes>
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<Splash />} />
           <Route path="/login" element={<Login />} />
            <Route path="/chat" element={<Chat />} />
+           <Route path='/terms' element={<Terms/>}/>
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/questions" element={<Questions />} />
           <Route path="/gender" element={<GenderSelect />} />
