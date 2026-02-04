@@ -31,22 +31,53 @@ exports.saveAnswers = async (req, res) => {
   }
 };
 
+// --- NEW: Update Profile (Nickname & Avatar) ---
+exports.updateProfile = async (req, res) => {
+  try {
+    const { nickname, avatar } = req.body;
+
+    if (!nickname || !avatar) {
+      return res.status(400).json({ message: "Nickname and avatar are required" });
+    }
+
+    // Update the 'name' field (used as nickname) and 'avatar'
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { name: nickname, avatar: avatar },
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json({
+      success: true,
+      user: {
+        name: updatedUser.name,
+        avatar: updatedUser.avatar,
+        onboardingComplete: updatedUser.onboardingComplete
+      }
+    });
+  } catch (error) {
+    console.error("Profile Update Error:", error);
+    res.status(500).json({ message: "Error updating profile" });
+  }
+};
+
 // --- MATCHING & MESSAGES ---
 
 exports.getMatches = async (req, res) => {
   try {
+    // 1. Fetch current user and populate lists with Avatar + Name
     const currentUser = await User.findById(req.user.id)
-      .populate('receivedRequests', 'name gender answers')
-      .populate('sentRequests', 'name gender answers')
-      .populate('matches', 'name gender'); // Matches are populated here
+      .populate('receivedRequests', 'name gender avatar answers') // Added avatar
+      .populate('sentRequests', 'name gender avatar answers')     // Added avatar
+      .populate('matches', 'name gender avatar');                 // Added avatar
 
-    // 1. Determine target gender for recommendations
+    // 2. Determine target gender for recommendations
     let targetGender;
     if (currentUser.gender === 'Man') targetGender = 'Woman';
     else if (currentUser.gender === 'Woman') targetGender = 'Man';
     else targetGender = ['Man', 'Woman', 'Non-binary'];
 
-    // 2. Exclude people we already know from recommendations
+    // 3. Exclude people we already know from recommendations
     const excludeIds = [
       currentUser._id,
       ...currentUser.sentRequests.map(u => u._id), 
@@ -54,14 +85,14 @@ exports.getMatches = async (req, res) => {
       ...currentUser.matches.map(u => u._id)
     ];
 
-    // 3. Find Candidates
+    // 4. Find Candidates
     const candidates = await User.find({
       gender: targetGender,
       _id: { $nin: excludeIds },
       onboardingComplete: true
     });
 
-    // 4. Score Candidates (Common Interests)
+    // 5. Score Candidates (Common Interests)
     const mySelections = currentUser.answers
       .filter(a => a.questionType === 'selection')
       .flatMap(a => a.selectedOptions);
@@ -77,6 +108,7 @@ exports.getMatches = async (req, res) => {
         _id: user._id,
         name: user.name,
         gender: user.gender,
+        avatar: user.avatar,  // <--- Added Avatar here
         matchCount: common.length,
         commonInterests: common.slice(0, 3),
         answers: user.answers 
@@ -86,12 +118,12 @@ exports.getMatches = async (req, res) => {
     // Sort by best match
     scoredCandidates.sort((a, b) => b.matchCount - a.matchCount);
 
-    // 5. Send Response
+    // 6. Send Response
     res.status(200).json({
       pending: currentUser.receivedRequests, 
       sent: currentUser.sentRequests,
       recommendations: scoredCandidates,
-      matches: currentUser.matches // <--- ADDED THIS LINE (Critical Fix)
+      matches: currentUser.matches 
     });
 
   } catch (error) {

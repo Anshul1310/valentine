@@ -1,8 +1,7 @@
-// src/pages/Home/Profile/Profile.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 
-// 10 Boys & 10 Girls (using DiceBear Adventurer seeds)
+// 10 Boys & 10 Girls (DiceBear Adventurer seeds)
 const AVATAR_OPTIONS = {
   boys: [
     'Felix', 'Aneka', 'Jack', 'Oliver', 'Max', 
@@ -16,18 +15,63 @@ const AVATAR_OPTIONS = {
 };
 
 const Profile = () => {
-  // State for user data
-  const [nickname, setNickname] = useState('Anshul'); // Default
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS.boys[0]);
-  const [activeTab, setActiveTab] = useState('boys'); // 'boys' or 'girls'
+  const [nickname, setNickname] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('');
+  const [activeTab, setActiveTab] = useState('boys'); 
   const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = () => {
-    // Logic to save to backend would go here
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000); // Reset "Saved!" message
-    console.log("Saved Profile:", { nickname, selectedAvatar });
+  // 1. Fetch current random nickname/avatar on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const res = await fetch('http://localhost:5000/api/user/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.name) setNickname(data.name);
+        if (data.avatar) setSelectedAvatar(data.avatar);
+        else setSelectedAvatar(AVATAR_OPTIONS.boys[0]); // Fallback
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to load profile", err);
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch('http://localhost:5000/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          nickname: nickname, 
+          avatar: selectedAvatar 
+        })
+      });
+
+      if (res.ok) {
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
+      } else {
+        alert("Failed to save changes");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving profile");
+    }
   };
+
+  if (loading) return <div className={styles.container}>Loading...</div>;
 
   return (
     <div className={styles.container}>

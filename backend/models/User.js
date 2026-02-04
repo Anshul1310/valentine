@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true }, // This will now store the Nickname
   email: { type: String, required: true, unique: true },
   dauthId: { type: String, required: true },
   gender: { type: String },
+  avatar: { type: String }, // <--- NEW FIELD
   
   onboardingComplete: { type: Boolean, default: false },
   
@@ -15,16 +16,10 @@ const userSchema = new mongoose.Schema({
     textAnswer: { type: String }
   }],
 
-  // --- NEW FIELDS ---
-  // Users I have sent an invite to
+  // ... (keep existing relationship fields: sentRequests, receivedRequests, matches) ...
   sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  
-  // Users who have sent me an invite
   receivedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  
-  // Confirmed matches (Chat allowed)
   matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  // ------------------
 
   role: { type: String, default: 'student' },
   createdAt: { type: Date, default: Date.now }
