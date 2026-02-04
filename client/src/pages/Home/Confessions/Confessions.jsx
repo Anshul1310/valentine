@@ -83,7 +83,7 @@ const Confessions = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.post(`http://localhost:5000/api/confessions/${id}/comment`, 
+      await axios.post(`/api/confessions/${id}/comment`, 
         { text },
         { headers: { Authorization: `Bearer ${token}` } }
       );

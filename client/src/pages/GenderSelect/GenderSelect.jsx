@@ -12,7 +12,7 @@ const GenderSelect = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.put('http://localhost:5000/api/user/gender', 
+      await axios.put('/api/user/gender', 
         { gender: selectedGender },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -14,7 +14,7 @@ const Messages = () => {
       try {
         const token = localStorage.getItem('authToken');
         // Fetch matches from the backend
-        const { data } = await axios.get('http://localhost:5000/api/user/matches', {
+        const { data } = await axios.get('/api/user/matches', {
           headers: { Authorization: `Bearer ${token}` }
         });
         

@@ -26,7 +26,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const res = await fetch('http://localhost:5000/api/user/me', {
+        const res = await fetch('/api/user/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -47,7 +47,7 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const res = await fetch('http://localhost:5000/api/user/profile', {
+      const res = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

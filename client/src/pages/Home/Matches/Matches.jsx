@@ -20,7 +20,7 @@ const Matches = () => {
   const fetchMatches = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const res = await axios.get('http://localhost:5000/api/user/matches', {
+      const res = await axios.get('/api/user/matches', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRecommendations(res.data.recommendations);
@@ -36,7 +36,7 @@ const Matches = () => {
     if (!selectedUser) return;
     try {
       const token = localStorage.getItem('authToken');
-      await axios.post(`http://localhost:5000/api/user/invite/${selectedUser._id}`, {}, {
+      await axios.post(`/api/user/invite/${selectedUser._id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

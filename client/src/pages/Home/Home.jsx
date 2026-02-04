@@ -84,7 +84,7 @@ const Home = () => {
     const checkMatches = async () => {
       if (!token) return;
       try {
-        const res = await axios.get('http://localhost:5000/api/user/matches', {
+        const res = await axios.get('/api/user/matches', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const currentMatches = res.data.matches?.length || 0;

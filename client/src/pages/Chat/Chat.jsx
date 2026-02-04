@@ -77,7 +77,7 @@ const Chat = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      let url = `http://localhost:5000/api/chat/history/${currentUserId}/${chatUserId}`;
+      let url = `/api/chat/history/${currentUserId}/${chatUserId}`;
       if (beforeTimestamp) {
         url += `?before=${beforeTimestamp}`;
       }

@@ -8,12 +8,15 @@ const AuthCallback = () => {
   const codeProcessed = useRef(false);
 
   useEffect(() => {
-    const code = searchParams.get('code');
+    const queryParams = new URLSearchParams(window.location.search);
+    const code = queryParams.get('code');
 
     if (code && !codeProcessed.current) {
       codeProcessed.current = true;
 
-      axios.post('http://localhost:5000/api/auth/dauth', { code })
+      axios.post('/api/auth/dauth', { code,
+        redirectUri: window.location.origin + '/auth/callback'
+       })
         .then((res) => {
           const { token, user } = res.data;
           localStorage.setItem('authToken', token);

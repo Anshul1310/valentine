@@ -91,7 +91,7 @@ const Questions = () => {
           }
         });
 
-        await axios.post('http://localhost:5000/api/user/answers', 
+        await axios.post('/api/user/answers', 
           { answers: formattedAnswers },
           { headers: { Authorization: `Bearer ${token}` } }
         );

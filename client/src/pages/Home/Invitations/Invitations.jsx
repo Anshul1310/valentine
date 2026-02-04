@@ -20,7 +20,7 @@ const Invitations = () => {
     try {
       const token = localStorage.getItem('authToken');
       // We reuse the same endpoint but focus on 'pending' data
-      const res = await axios.get('http://localhost:5000/api/user/matches', {
+      const res = await axios.get('/api/user/matches', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingRequests(res.data.pending);
@@ -35,7 +35,7 @@ const Invitations = () => {
     if (!selectedUser) return;
     try {
       const token = localStorage.getItem('authToken');
-      await axios.post(`http://localhost:5000/api/user/accept/${selectedUser._id}`, {}, {
+      await axios.post(`/api/user/accept/${selectedUser._id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
