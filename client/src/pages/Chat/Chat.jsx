@@ -1,4 +1,3 @@
-// src/pages/Chat/Chat.jsx
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -8,26 +7,25 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true); // Is there more history?
+  const [hasMore, setHasMore] = useState(true);
   
   const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null); // Ref for the scrollable container
+  const chatContainerRef = useRef(null);
   const ws = useRef(null); 
   
   const navigate = useNavigate();
   const location = useLocation();
   const targetUser = location.state?.chatUser;
 
-  // --- Auth Helper ---
   const getCurrentUserId = () => {
     const token = localStorage.getItem('authToken');
     if (!token) return null;
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
       return JSON.parse(jsonPayload).id;
     } catch (error) {
       return null;
@@ -43,7 +41,36 @@ const Chat = () => {
     avatar: `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`
   };
 
-  // --- 1. Fetch History Function ---
+  // --- Browser-Native Pop Sound (No File Needed) ---
+  const playPopSound = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      
+      const ctx = new AudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      // "Pop" effect: Frequency drops quickly
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(600, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+
+      // Volume envelope: Fade out quickly
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+      console.error("Audio play failed", e);
+    }
+  };
+
+  // --- Fetch History ---
   const fetchHistory = useCallback(async (beforeTimestamp = null) => {
     if (!currentUserId || !chatUserId) return;
     
@@ -60,23 +87,21 @@ const Chat = () => {
       });
 
       if (data.length < 20) {
-        setHasMore(false); // No more messages to load
+        setHasMore(false);
       }
 
       const formattedMessages = data.map(msg => ({
         id: msg._id,
         text: msg.text,
         sender: msg.senderId === currentUserId ? "me" : "them",
-        timestamp: msg.timestamp, // Keep raw timestamp for cursor
+        timestamp: msg.timestamp,
         time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }));
 
       setMessages(prev => {
         if (!beforeTimestamp) {
-          // Initial load: Replace all
           return formattedMessages;
         } else {
-          // Load more: Prepend to top
           return [...formattedMessages, ...prev];
         }
       });
@@ -88,47 +113,17 @@ const Chat = () => {
     }
   }, [currentUserId, chatUserId]);
 
-  // --- 2. Initial Load ---
   useEffect(() => {
-    fetchHistory(); // Load first 20
+    fetchHistory();
   }, [fetchHistory]);
 
-  // --- 3. Scroll to Bottom on Initial Load / New Message ---
   useEffect(() => {
-    // Only auto-scroll if we are at the bottom OR it's the initial load (messages small)
-    // We check if we just loaded 'old' messages by comparing length, 
-    // but simpler approach: use a flag or check scroll position.
-    // Here we use a simple heuristic: if we just sent a message (me) or it's short, scroll.
     if (!loading && messages.length <= 20) {
          messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
     }
-  }, [messages.length]); 
+  }, [messages.length, loading]); 
 
-  // --- 4. Infinite Scroll Handler ---
-  const handleScroll = async () => {
-    const container = chatContainerRef.current;
-    if (!container) return;
-
-    // If scrolled to top (scrollTop === 0) and we have more messages
-    if (container.scrollTop === 0 && hasMore && !loading) {
-      const oldScrollHeight = container.scrollHeight;
-      
-      // Get timestamp of the OLDEST message (index 0)
-      const oldestMessage = messages[0];
-      if (oldestMessage) {
-        await fetchHistory(oldestMessage.timestamp);
-        
-        // Restore Scroll Position:
-        // New Height - Old Height = The amount of new content added. 
-        // We set scrollTop to that amount to keep the user's view stable.
-        requestAnimationFrame(() => {
-          container.scrollTop = container.scrollHeight - oldScrollHeight;
-        });
-      }
-    }
-  };
-
-  // --- 5. WebSocket Logic (Keep existing) ---
+  // --- WebSocket Logic ---
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
     ws.current = new WebSocket('ws://localhost:5000');
@@ -139,16 +134,22 @@ const Chat = () => {
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      const isSelf = (data.isSelf || data.senderId === currentUserId);
+      
       const newMessage = {
         id: Date.now(),
         text: data.text,
-        sender: (data.isSelf || data.senderId === currentUserId) ? "me" : "them",
+        sender: isSelf ? "me" : "them",
         timestamp: data.timestamp,
         time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, newMessage]);
       
-      // Auto-scroll to bottom on new message
+      // Play sound if message is from 'them'
+      if (!isSelf) {
+        playPopSound();
+      }
+
       setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -157,7 +158,6 @@ const Chat = () => {
     return () => { if (ws.current) ws.current.close(); };
   }, [currentUserId, chatUserId]);
 
-  // --- 6. Send Handler ---
   const handleSend = (e) => {
     e.preventDefault();
     if (!inputText.trim() || !currentUserId) return;
@@ -173,11 +173,25 @@ const Chat = () => {
     setInputText("");
   };
 
+  const handleScroll = async () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    if (container.scrollTop === 0 && hasMore && !loading) {
+      const oldScrollHeight = container.scrollHeight;
+      const oldestMessage = messages[0];
+      if (oldestMessage) {
+        await fetchHistory(oldestMessage.timestamp);
+        requestAnimationFrame(() => {
+          container.scrollTop = container.scrollHeight - oldScrollHeight;
+        });
+      }
+    }
+  };
+
   if (!targetUser) return <div>Loading...</div>;
 
   return (
     <div className={styles.container}>
-      {/* Header */}
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>←</button>
         <div className={styles.headerInfo}>
@@ -189,13 +203,11 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Message List with Scroll Handler */}
       <div 
         className={styles.messageList} 
         ref={chatContainerRef}
         onScroll={handleScroll}
       >
-        {/* Loading Spinner at top */}
         {loading && hasMore && <div style={{textAlign:'center', fontSize:'12px', color:'#888'}}>Loading history...</div>}
 
         {messages.map((msg, index) => (
@@ -209,7 +221,6 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Footer */}
       <form className={styles.footer} onSubmit={handleSend}>
         <input 
           className={styles.inputField}

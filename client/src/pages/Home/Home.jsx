@@ -12,7 +12,34 @@ const Home = () => {
   const [hasNotification, setHasNotification] = useState(false);
   const ws = useRef(null);
 
-  // Helper to get User ID
+  // --- Browser-Native Pop Sound Utility ---
+  const playPopSound = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      
+      const ctx = new AudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      // "Pop" effect
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(600, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
+
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+      console.error("Audio play failed", e);
+    }
+  };
+
   const getCurrentUserId = () => {
     const token = localStorage.getItem('authToken');
     if (!token) return null;
@@ -28,34 +55,32 @@ const Home = () => {
     }
   };
 
-  // 1. WebSocket & Polling Logic
   useEffect(() => {
     const userId = getCurrentUserId();
     const token = localStorage.getItem('authToken');
     
-    // --- A. WebSocket for Real-time Messages ---
+    // --- WebSocket for Messages ---
     if (userId) {
       ws.current = new WebSocket('ws://localhost:5000');
       
       ws.current.onopen = () => {
-        // Register this "Home" connection
         ws.current.send(JSON.stringify({ type: 'register', senderId: userId }));
       };
 
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         
-        // If it's a message from someone else
         if (!data.isSelf) {
-          // Only show dot if NOT currently on messages tab
+          // If NOT on messages tab, show dot AND play sound
           if (activeTab !== 'messages') {
             setHasNotification(true);
+            playPopSound();
           }
         }
       };
     }
 
-    // --- B. Polling for New Matches (Accepted Invites) ---
+    // --- Polling for Matches ---
     const checkMatches = async () => {
       if (!token) return;
       try {
@@ -67,6 +92,7 @@ const Home = () => {
 
         if (currentMatches > seenMatches) {
           setHasNotification(true);
+          playPopSound(); // Optional: Play sound on new match too
         }
       } catch (error) {
         console.error("Error checking activity", error);
@@ -74,22 +100,18 @@ const Home = () => {
     };
 
     checkMatches();
-    const interval = setInterval(checkMatches, 10000); // Check every 10s
+    const interval = setInterval(checkMatches, 10000); 
 
     return () => {
       clearInterval(interval);
       if (ws.current) ws.current.close();
     };
-  }, [activeTab]); // Re-run if activeTab changes to ensure logic allows/blocks dot
+  }, [activeTab]); 
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
-    
-    // Clear notification when entering Messages
     if (tabId === 'messages') {
       setHasNotification(false);
-      
-      // Update "seen" count
       const token = localStorage.getItem('authToken');
       if (token) {
         axios.get('http://localhost:5000/api/user/matches', {
@@ -102,7 +124,7 @@ const Home = () => {
   };
 
   const tabs = [
-    { id: 'messages', label: 'Messages', icon: '💬' }, // Dot will appear here
+    { id: 'messages', label: 'Messages', icon: '💬' },
     { id: 'invitations', label: 'Invitations', icon: '💌' },
     { id: 'matches', label: 'Matches', icon: '🔥' },
     { id: 'confessions', label: 'Confessions', icon: '🤫' },
@@ -133,11 +155,9 @@ const Home = () => {
             className={`${styles.navItem} ${activeTab === tab.id ? styles.activeNavItem : ''}`}
             onClick={() => handleTabChange(tab.id)}
           >
-            {/* The Red Dot Notification */}
             {tab.id === 'messages' && hasNotification && activeTab !== 'messages' && (
               <span className={styles.notificationDot} />
             )}
-
             <span className={styles.icon}>{tab.icon}</span>
             <span className={styles.label}>{tab.label}</span>
           </div>
