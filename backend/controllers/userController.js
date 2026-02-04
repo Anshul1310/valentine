@@ -1,6 +1,5 @@
+// backend/controllers/userController.js
 const User = require('../models/User');
-
-// ... (keep getMe, updateGender, saveAnswers as they are) ...
 
 exports.getMe = async (req, res) => {
   try {
@@ -32,38 +31,37 @@ exports.saveAnswers = async (req, res) => {
   }
 };
 
-
-// --- NEW FUNCTIONS ---
-
-// GET /api/user/matches
-
-// ... (Other functions like getMe, updateGender, saveAnswers remain same) ...
+// --- MATCHING & MESSAGES ---
 
 exports.getMatches = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id)
       .populate('receivedRequests', 'name gender answers')
-      .populate('sentRequests', 'name gender answers') // <--- NEW: Populate Sent Requests
-      .populate('matches', 'name gender');
+      .populate('sentRequests', 'name gender answers')
+      .populate('matches', 'name gender'); // Matches are populated here
 
+    // 1. Determine target gender for recommendations
     let targetGender;
     if (currentUser.gender === 'Man') targetGender = 'Woman';
     else if (currentUser.gender === 'Woman') targetGender = 'Man';
     else targetGender = ['Man', 'Woman', 'Non-binary'];
 
+    // 2. Exclude people we already know from recommendations
     const excludeIds = [
       currentUser._id,
-      ...currentUser.sentRequests.map(u => u._id), // Ensure we exclude full objects
+      ...currentUser.sentRequests.map(u => u._id), 
       ...currentUser.receivedRequests.map(u => u._id),
       ...currentUser.matches.map(u => u._id)
     ];
 
+    // 3. Find Candidates
     const candidates = await User.find({
       gender: targetGender,
       _id: { $nin: excludeIds },
       onboardingComplete: true
     });
 
+    // 4. Score Candidates (Common Interests)
     const mySelections = currentUser.answers
       .filter(a => a.questionType === 'selection')
       .flatMap(a => a.selectedOptions);
@@ -85,12 +83,15 @@ exports.getMatches = async (req, res) => {
       };
     });
 
+    // Sort by best match
     scoredCandidates.sort((a, b) => b.matchCount - a.matchCount);
 
+    // 5. Send Response
     res.status(200).json({
       pending: currentUser.receivedRequests, 
-      sent: currentUser.sentRequests, // <--- Now contains full user details
-      recommendations: scoredCandidates
+      sent: currentUser.sentRequests,
+      recommendations: scoredCandidates,
+      matches: currentUser.matches // <--- ADDED THIS LINE (Critical Fix)
     });
 
   } catch (error) {
@@ -99,9 +100,6 @@ exports.getMatches = async (req, res) => {
   }
 };
 
-
-
-// POST /api/user/invite/:id
 exports.sendInvite = async (req, res) => {
   try {
     const targetId = req.params.id;
@@ -119,21 +117,20 @@ exports.sendInvite = async (req, res) => {
   }
 };
 
-// POST /api/user/accept/:id
 exports.acceptInvite = async (req, res) => {
   try {
-    const requesterId = req.params.id; // The person who sent me the invite
+    const requesterId = req.params.id; 
     const currentId = req.user.id;
 
-    // 1. Add to 'matches' for both
+    // Add to 'matches' for both and remove from pending/sent lists
     await User.findByIdAndUpdate(currentId, { 
       $addToSet: { matches: requesterId },
-      $pull: { receivedRequests: requesterId } // Remove from pending
+      $pull: { receivedRequests: requesterId } 
     });
 
     await User.findByIdAndUpdate(requesterId, { 
       $addToSet: { matches: currentId },
-      $pull: { sentRequests: currentId } // Remove from their sent
+      $pull: { sentRequests: currentId } 
     });
 
     res.status(200).json({ success: true, message: "It's a match!" });
