@@ -1,11 +1,9 @@
 /* --- Main Layout --- */
 .container {
   padding: 1.5rem;
-  padding-bottom: 6rem; /* Extra space for Bottom Navigation */
-  background-color: #f8f9fa;
+  padding-bottom: 7rem;
+  background-color: var(--bg-color);
   min-height: 100vh;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .loading {
@@ -13,7 +11,7 @@
   justify-content: center;
   align-items: center;
   height: 80vh;
-  color: #ff4b6e;
+  color: var(--primary-color);
   font-weight: 700;
   font-size: 1.2rem;
   animation: pulse 1.5s infinite ease-in-out;
@@ -31,18 +29,16 @@
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--text-dark);
   margin-bottom: 0.25rem;
-  margin-top: 0;
 }
 
 .subtitle {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1rem;
-  margin-top: 0;
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  margin-bottom: 1.25rem;
 }
 
 /* --- Pending Requests List --- */
@@ -53,67 +49,42 @@
 }
 
 .pendingCard {
-  background: white;
-  border-radius: 16px;
+  background: var(--surface-color);
+  border-radius: var(--border-radius-md);
   padding: 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-  border: 1px solid #f0f0f0;
-  transition: transform 0.2s ease;
-}
-
-.pendingCard:active {
-  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid transparent;
 }
 
 .avatar {
-  font-size: 2rem;
-  background: #fff0f3;
-  width: 50px;
-  height: 50px;
+  font-size: 1.8rem;
+  background: #f3f4f6;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.info {
-  flex: 1;
-}
-
 .info h4 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-dark);
 }
 
-.tag {
-  font-size: 0.75rem;
-  color: #ff4b6e;
-  background: rgba(255, 75, 110, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.acceptButton {
-  background: #ff4b6e;
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 75, 110, 0.2);
-  transition: all 0.2s ease;
-}
-
-.acceptButton:active {
-  transform: scale(0.95);
+.statusTag {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  background-color: #f3f4f6;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 4px;
 }
 
 /* --- Recommendations List --- */
@@ -124,19 +95,22 @@
 }
 
 .matchCard {
-  background: white;
-  border-radius: 20px;
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
   padding: 1.5rem;
   position: relative;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s;
 }
 
-/* Gold Styling for the Top Match */
+.matchCard:active {
+  transform: scale(0.99);
+}
+
+/* Gold Styling for Top Match */
 .matchCard:first-child {
-  border: 2px solid #ffd700; /* Gold border */
-  background: linear-gradient(to bottom, #fffdf5, #ffffff);
+  border: 2px solid #ffd700;
+  background: linear-gradient(to bottom, #fffdf0, #ffffff);
 }
 
 .crown {
@@ -144,15 +118,13 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #ffd700;
-  color: #5a4a00;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  z-index: 2;
-  white-space: nowrap;
+  background: linear-gradient(90deg, #ffd700, #ffb900);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
 }
 
 .cardHeader {
@@ -164,102 +136,97 @@
 
 .matchAvatar {
   font-size: 2.5rem;
-  background: #f5f5f5;
-  width: 60px;
-  height: 60px;
+  background: #fff0f3;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--primary-color);
 }
 
 .matchScore {
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 6px 12px;
+  background: #ecfdf5;
+  color: #059669;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: -0.5px;
 }
 
 .cardBody h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #222;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-dark);
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-bottom: 1.5rem;
 }
 
 .pill {
-  background: #f0f2f5;
-  color: #555;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  background: #f3f4f6;
+  color: var(--text-medium);
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
 .inviteButton {
   width: 100%;
-  padding: 0.9rem;
-  background: #1a1a1a;
-  color: white;
+  padding: 1rem;
+  background: var(--text-dark);
+  color: var(--white);
   border: none;
-  border-radius: 14px;
+  border-radius: var(--border-radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: opacity 0.2s;
 }
 
 .inviteButton:active {
-  background: #333;
-  transform: scale(0.98);
+  opacity: 0.8;
 }
 
-/* --- MODAL (The Popup) --- */
-
+/* --- MODAL --- */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px); /* Blurs the background content */
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* Align bottom on mobile */
+  align-items: flex-end;
   z-index: 2000;
   animation: fadeIn 0.3s ease forwards;
 }
 
-/* Desktop Adjustment */
 @media (min-width: 600px) {
-  .modalOverlay {
-    align-items: center; /* Center on desktop */
-  }
+  .modalOverlay { align-items: center; }
 }
 
 .modalContent {
   width: 100%;
   max-width: 500px;
-  background: #ffffff;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  background: var(--surface-color);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
   padding: 2rem;
-  padding-bottom: 3rem; /* Extra padding for iPhone home bar */
+  padding-bottom: 3rem;
   display: flex;
   flex-direction: column;
   max-height: 85vh;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -271,7 +238,6 @@
   }
 }
 
-/* Modal Header */
 .modalHeader {
   display: flex;
   flex-direction: column;
@@ -290,82 +256,58 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  border: 4px solid #fff;
-  box-shadow: 0 5px 15px rgba(255, 75, 110, 0.15);
+  color: var(--primary-color);
+  box-shadow: 0 8px 20px rgba(255, 75, 110, 0.2);
 }
 
 .modalHeader h2 {
   margin: 0;
   font-size: 1.8rem;
-  color: #1a1a1a;
+  color: var(--text-dark);
 }
 
 .modalHeader p {
   margin: 0.5rem 0 0 0;
-  color: #666;
-  font-size: 0.95rem;
+  color: var(--text-light);
 }
 
-/* Modal Body (Q&A) */
 .modalBody {
   flex: 1;
   overflow-y: auto;
   margin-bottom: 2rem;
-  padding-right: 5px; /* Prevent scrollbar overlap */
-}
-
-/* Custom Scrollbar for Modal */
-.modalBody::-webkit-scrollbar {
-  width: 4px;
-}
-.modalBody::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 4px;
 }
 
 .detailsTitle {
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #999;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
   font-weight: 700;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
 }
 
 .qnaBlock {
-  background: #f9f9f9;
+  background: var(--bg-color);
   padding: 1.25rem;
   border-radius: 16px;
   margin-bottom: 1rem;
-  border: 1px solid #f0f0f0;
 }
 
 .qLabel {
   font-size: 0.85rem;
-  color: #ff4b6e;
+  color: var(--primary-color);
   font-weight: 700;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
 }
 
 .qAnswer {
-  font-size: 1.05rem;
-  color: #333;
+  font-size: 1.1rem;
+  color: var(--text-dark);
   margin: 0;
-  line-height: 1.6;
-  font-weight: 500;
+  line-height: 1.5;
 }
 
-.noInfo {
-  text-align: center;
-  color: #aaa;
-  font-style: italic;
-  padding: 1rem;
-}
-
-/* Modal Footer (Buttons) */
 .modalFooter {
   display: flex;
   gap: 1rem;
@@ -373,58 +315,28 @@
 
 .cancelBtn {
   flex: 1;
-  padding: 1rem;
+  padding: 1.1rem;
   border: none;
-  background: #f0f2f5;
-  color: #666;
+  background: #f3f4f6;
+  color: var(--text-medium);
   border-radius: 14px;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.cancelBtn:active {
-  background: #e4e6eb;
 }
 
 .confirmBtn {
   flex: 2;
-  padding: 1rem;
+  padding: 1.1rem;
   border: none;
-  background: #ff4b6e;
-  color: white;
+  background: var(--primary-color);
+  color: var(--white);
   border-radius: 14px;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
-  transition: transform 0.2s;
+  box-shadow: var(--shadow-glow);
 }
 
-.confirmBtn:active {
-  transform: scale(0.98);
-}
-
-/* --- Animations --- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* Add this to your existing Matches.module.css */
-
-.statusTag {
-  font-size: 0.8rem;
-  color: #888;
-  background-color: #f0f0f0;
-  padding: 4px 10px;
-  border-radius: 12px;
-  display: inline-block;
-  margin-top: 4px;
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

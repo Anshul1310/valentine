@@ -4,54 +4,32 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #ffffff;
-  overflow: hidden; /* Clips the decorative circles */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-color); /* Uniform BG */
+  overflow: hidden;
   justify-content: center;
   align-items: center;
-}
-
-/* --- Animations --- */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.animateIn {
-  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 /* --- Decorative Background Elements --- */
 .circleTop {
   position: absolute;
-  top: -100px;
-  right: -50px;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(255,75,110,0.1) 0%, rgba(255,255,255,0) 70%);
+  top: -120px;
+  right: -80px;
+  width: 350px;
+  height: 350px;
+  /* Use primary color with opacity for consistency */
+  background: radial-gradient(circle, rgba(255, 75, 110, 0.15) 0%, rgba(255,255,255,0) 70%);
   border-radius: 50%;
   z-index: 0;
 }
 
 .circleBottom {
   position: absolute;
-  bottom: -50px;
-  left: -100px;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255,75,110,0.08) 0%, rgba(255,255,255,0) 70%);
+  bottom: -80px;
+  left: -120px;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 158, 66, 0.12) 0%, rgba(255,255,255,0) 70%);
   border-radius: 50%;
   z-index: 0;
 }
@@ -61,13 +39,13 @@
   z-index: 1;
   width: 100%;
   max-width: 400px;
-  padding: 2rem;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 60%; /* Spreads content vertically */
-  opacity: 0; /* Starts hidden for animation */
+  height: 65%;
+  opacity: 0;
 }
 
 /* --- Logo Section --- */
@@ -76,37 +54,44 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .logoBg {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(135deg, #fff0f3 0%, #ffeef1 100%);
-  border-radius: 30px;
+  width: 120px;
+  height: 120px;
+  background: var(--surface-color);
+  border-radius: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 10px 25px rgba(255, 75, 110, 0.15);
-  animation: pulse 3s infinite ease-in-out;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md); /* Consistent shadow */
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
 .logoEmoji {
-  font-size: 3.5rem;
+  font-size: 4rem;
 }
 
 .appName {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 800;
-  color: #ff4b6e; /* Brand Pink */
+  color: var(--primary-color); /* Uniform Theme Color */
   letter-spacing: -1px;
   margin: 0;
+  line-height: 1.2;
 }
 
 .tagline {
   font-size: 1.1rem;
-  color: #888;
+  color: var(--text-light);
   margin-top: 0.5rem;
   font-weight: 500;
 }
@@ -123,40 +108,60 @@
 
 .dauthButton {
   width: 100%;
-  padding: 1rem;
+  padding: 1.1rem;
   border: none;
-  border-radius: 50px;
-  background: #1a1a1a; /* Black contrast for login */
-  color: white;
+  border-radius: var(--border-radius-lg);
+  background: var(--text-dark); /* Keeping black for high contrast */
+  color: var(--white);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-family);
+}
+
+.dauthButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
 .dauthButton:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
 }
 
 .btnIcon {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
 
 .disclaimer {
-  font-size: 0.8rem;
-  color: #aaa;
+  font-size: 0.85rem;
+  color: var(--text-light);
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .link {
-  color: #ff4b6e;
+  color: var(--primary-color);
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
+
+.animateIn {
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }

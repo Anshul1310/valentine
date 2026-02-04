@@ -3,46 +3,44 @@
   flex-direction: column;
   height: 100vh;
   padding: 2rem 1.5rem;
-  background-color: #ffffff;
-  box-sizing: border-box;
+  background-color: var(--bg-color);
   justify-content: space-between;
 }
 
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-dark);
   margin-bottom: 0.5rem;
-  text-align: left;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #666;
+  color: var(--text-medium);
   margin-bottom: 3rem;
-  text-align: left;
 }
 
 .optionsGrid {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  flex: 1; /* Pushes content to fill space */
+  flex: 1;
 }
 
 .optionCard {
-  background: #fff;
-  border: 2px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 1.25rem;
+  background: var(--surface-color);
+  border: 2px solid transparent; /* Prepare for border change */
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
-  outline: none;
   width: 100%;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-family);
 }
 
 .optionCard:active {
@@ -51,9 +49,10 @@
 
 /* Selected State */
 .selected {
-  border-color: #ff4b6e; /* Brand Pink */
-  background-color: #fff0f3;
-  color: #ff4b6e;
+  border-color: var(--primary-color);
+  background-color: #fff0f3; /* Slight tint of primary */
+  color: var(--primary-color);
+  box-shadow: var(--shadow-glow);
 }
 
 .footer {
@@ -63,23 +62,23 @@
 
 .nextButton {
   width: 100%;
-  padding: 1rem;
+  padding: 1.2rem;
   border: none;
-  border-radius: 50px;
-  background-color: #e5e5e5;
-  color: #a5a5a5;
+  border-radius: var(--border-radius-lg);
+  background-color: #e5e7eb;
+  color: var(--text-light);
   font-size: 1rem;
   font-weight: 700;
   cursor: not-allowed;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
 }
 
-/* Button Active State (When gender is selected) */
 .nextButton:not(:disabled) {
-  background-color: #ff4b6e;
-  color: white;
+  background: var(--main-gradient);
+  color: var(--white);
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 .nextButton:not(:disabled):active {

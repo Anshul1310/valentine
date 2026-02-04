@@ -9,7 +9,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const confessionRoutes = require('./routes/confessionRoutes');
 const userRoutes = require('./routes/userRoutes');
-const chatRoutes = require('./routes/chatRoutes'); // <--- IMPORT THIS
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/confessions', confessionRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/chat', chatRoutes); // <--- USE THIS
+app.use('/api/chat', chatRoutes);
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -34,7 +34,9 @@ const server = app.listen(PORT, () => console.log(`🚀 Server running on port $
 
 // 2. Initialize WebSocket Server
 const wss = new WebSocketServer({ server });
-const clients = new Map();
+
+// CHANGED: Use a Set to allow multiple connections (tabs/components) per user
+const clients = new Map(); // Key: userId, Value: Set<WebSocket>
 
 wss.on('connection', (ws, req) => {
   console.log('🔌 New Client Connected');
@@ -45,7 +47,14 @@ wss.on('connection', (ws, req) => {
       const { type, senderId, receiverId, text } = parsedMessage;
 
       if (type === 'register') {
-        clients.set(senderId, ws);
+        // Add to the Set of sockets for this user
+        if (!clients.has(senderId)) {
+          clients.set(senderId, new Set());
+        }
+        clients.get(senderId).add(ws);
+        
+        // Tag the socket with the userId for cleanup later
+        ws.userId = senderId;
         return;
       }
 
@@ -53,15 +62,22 @@ wss.on('connection', (ws, req) => {
         const newMessage = new Message({ senderId, receiverId, text });
         await newMessage.save();
 
-        const receiverSocket = clients.get(receiverId);
-        if (receiverSocket && receiverSocket.readyState === 1) { 
-          receiverSocket.send(JSON.stringify({
+        // 1. Send to ALL of Receiver's active sockets
+        const receiverSockets = clients.get(receiverId);
+        if (receiverSockets) {
+          const payload = JSON.stringify({
             senderId,
             text,
             timestamp: newMessage.timestamp
-          }));
+          });
+          receiverSockets.forEach(socket => {
+            if (socket.readyState === 1) {
+              socket.send(payload);
+            }
+          });
         }
 
+        // 2. Send confirmation to the Sender's specific socket (that sent this)
         ws.send(JSON.stringify({
           senderId,
           text,
@@ -75,10 +91,12 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    for (const [userId, socket] of clients.entries()) {
-      if (socket === ws) {
-        clients.delete(userId);
-        break;
+    // Cleanup: Remove this specific socket from the user's Set
+    if (ws.userId && clients.has(ws.userId)) {
+      const userSockets = clients.get(ws.userId);
+      userSockets.delete(ws);
+      if (userSockets.size === 0) {
+        clients.delete(ws.userId);
       }
     }
   });

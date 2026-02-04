@@ -1,28 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #ff4b6e;
-  --secondary-color: #ff9e42;
-  --bg-color: #ffffff;
-  --text-dark: #333333;
-  --text-light: #888888;
+  /* --- Brand Colors --- */
+  --primary-color: #ff4b6e;   /* The main Pink */
+  --secondary-color: #ff9e42; /* The Orange accent */
+  
+  /* --- Functional Colors --- */
+  --bg-color: #f8f9fa;        /* Light grey background for the app */
+  --surface-color: #ffffff;   /* Pure white for cards/navbars */
+  
+  /* --- Typography Colors --- */
+  --text-dark: #1f2937;       /* Soft black for headings */
+  --text-medium: #4b5563;     /* Dark grey for body text */
+  --text-light: #9ca3af;      /* Light grey for placeholders/inactive */
   --white: #ffffff;
+
+  /* --- Global Styles --- */
   --font-family: 'Poppins', sans-serif;
+  --border-radius-lg: 24px;
+  --border-radius-md: 16px;
+  --border-radius-sm: 12px;
+
+  /* --- Effects --- */
+  --main-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 8px 20px rgba(255, 75, 110, 0.25); /* Pink glow */
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  
-  /* 1. Hide scrollbar for Firefox */
   scrollbar-width: none !important; 
-  
-  /* 2. Hide scrollbar for IE/Edge */
   -ms-overflow-style: none !important; 
 }
 
-/* 3. Hide scrollbar for Chrome, Safari, and Opera */
 *::-webkit-scrollbar {
   display: none !important;
   width: 0px !important;
@@ -31,17 +44,9 @@
 
 body {
   font-family: var(--font-family);
-  background-color: #f5f5f5;
-  overflow: hidden; /* Prevents the main window from scrolling */
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Utility class if you need to force it specifically on a div */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }

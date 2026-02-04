@@ -2,13 +2,12 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-color);
 }
 
 /* --- Header & Progress --- */
 .header {
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -16,20 +15,20 @@
 
 .progressBar {
   display: flex;
-  gap: 4px;
-  height: 4px;
+  gap: 6px;
+  height: 6px;
   width: 100%;
 }
 
 .progressSegment {
   flex: 1;
-  background-color: #f0f0f0;
-  border-radius: 2px;
-  transition: background-color 0.3s ease;
+  background-color: #e5e7eb;
+  border-radius: 10px;
+  transition: background-color 0.4s ease;
 }
 
 .activeSegment {
-  background-color: #ff4b6e; /* Brand Pink */
+  background-color: var(--primary-color);
 }
 
 /* --- Main Content --- */
@@ -44,18 +43,18 @@
 .questionTitle {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-dark);
   margin-bottom: 0.5rem;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .questionDescription {
   font-size: 1rem;
-  color: #666;
+  color: var(--text-medium);
   margin-bottom: 2rem;
 }
 
-/* --- Options (Multiple Choice) --- */
+/* --- Options --- */
 .optionsList {
   display: flex;
   flex-direction: column;
@@ -63,86 +62,79 @@
 }
 
 .optionCard {
-  background: #fff;
-  border: 2px solid #e5e5e5;
-  border-radius: 16px;
+  background: var(--surface-color);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-md);
   padding: 1.25rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-}
-
-.optionCard:active {
-  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-family);
 }
 
 .selectedOption {
-  border-color: #ff4b6e;
+  border-color: var(--primary-color);
   background-color: #fff0f3;
-  color: #ff4b6e;
+  color: var(--primary-color);
+  box-shadow: var(--shadow-glow);
 }
 
-/* --- Text Input (New) --- */
-.textInputContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
+/* --- Text Input --- */
 .textArea {
   width: 100%;
-  min-height: 150px;
+  min-height: 180px;
   padding: 1.25rem;
   font-size: 1.1rem;
-  color: #333;
-  background-color: #f8f9fa;
-  border: 2px solid #e5e5e5;
-  border-radius: 16px;
-  resize: none; /* Disable manual resize */
+  color: var(--text-dark);
+  background-color: var(--surface-color);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-md);
+  resize: none;
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
-  box-sizing: border-box;
+  box-shadow: var(--shadow-sm);
 }
 
 .textArea:focus {
-  border-color: #ff4b6e;
-  background-color: #fff;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(255, 75, 110, 0.1);
 }
 
 .textArea::placeholder {
-  color: #a5a5a5;
+  color: var(--text-light);
 }
 
 /* --- Footer --- */
 .footer {
   padding: 1.5rem;
-  background: #fff; /* Ensure background covers content if scrolling */
+  background: var(--bg-color); 
 }
 
 .nextButton {
   width: 100%;
-  padding: 1rem;
+  padding: 1.2rem;
   border: none;
-  border-radius: 50px;
-  background-color: #e5e5e5;
-  color: #a5a5a5;
+  border-radius: var(--border-radius-lg);
+  background-color: #e5e7eb;
+  color: var(--text-light);
   font-size: 1rem;
   font-weight: 700;
   cursor: not-allowed;
   transition: all 0.3s ease;
+  font-family: var(--font-family);
 }
 
 .activeButton {
-  background-color: #ff4b6e;
-  color: white;
+  background: var(--main-gradient);
+  color: var(--white);
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 .activeButton:active {
