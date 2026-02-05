@@ -1,6 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
-import MobileGuard from './components/guards/MobileGuard';
-import ProtectedRoute from './components/guards/ProtectedRoute'; 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/guards/ProtectedRoute';
 
 // Pages
 import Splash from './pages/Splash/Splash';
@@ -16,36 +15,37 @@ import Terms from './pages/Terms/Terms';
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* --- EXCLUDED FROM MOBILE GUARD --- */}
-        {/* This route will work on Desktop and Mobile without the guard */}
-        <Route path="/auth/callback" element={<AuthCallback />} />
-         <Route element={<ProtectedRoute />}>
-            <Route path="/questions" element={<Questions />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/gender" element={<GenderSelect />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
-          </Route>
-
-        {/* --- MOBILE GUARDED ROUTES --- */}
-        {/* Everything inside this Route wrapper gets the MobileGuard */}
-        <Route element={
-          <MobileGuard>
-            <Outlet />
-          </MobileGuard>
-        }>
+      {/* --- GLOBAL MOBILE LAYOUT --- */}
+      {/* This outer div creates the gray background and centers the content */}
+      <div className="min-h-screen bg-gray-100 flex justify-center">
+        
+        {/* This inner div forces the 'Mobile App' width and height */}
+        <div className="w-full max-w-[430px] min-h-screen bg-white shadow-xl relative overflow-hidden">
           
-          {/* Public Routes (Guarded) */}
-          <Route path="/" element={<Splash />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/login" element={<Login />} />
+          <Routes>
+            {/* --- PUBLIC ROUTES --- */}
+            <Route path="/" element={<Splash />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/login" element={<Login />} />
+            
+            {/* The AuthCallback is now inside the mobile layout container,
+               so it will remain mobile-sized while processing.
+            */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* Protected Routes (Guarded) */}
-         
+            {/* --- PROTECTED ROUTES --- */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/questions" element={<Questions />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/gender" element={<GenderSelect />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/chat" element={<Chat />} />
+            </Route>
 
-        </Route>
-      </Routes>
+          </Routes>
+          
+        </div>
+      </div>
     </Router>
   );
 }
