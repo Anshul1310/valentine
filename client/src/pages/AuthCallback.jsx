@@ -15,7 +15,7 @@ const AuthCallback = () => {
       codeProcessed.current = true;
 
       axios.post('/api/auth/dauth', { code,
-        redirectUri: window.location.origin + '/auth/callback'
+        redirectUri: 'https://benchbae.in/auth/callback'
        })
         .then((res) => {
           const { token, user } = res.data;
