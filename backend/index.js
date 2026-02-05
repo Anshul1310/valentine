@@ -12,16 +12,22 @@ const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
+const path=require("path")
+app.use(cors({ origin: '*' }));app.use(express.json());
+const buildPath = path.join(__dirname, '../client/build');
+app.use(express.static(buildPath));
 
-app.use(cors({ origin: 'http://localhost:3000' })); 
-app.use(express.json());
+// 3. The "Catch-All" Route (Critical for React Router)
+// This fixes the "404 Not Found" error when you refresh the page on /chat or /profile
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/confessions', confessionRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
-
+app.get('/{any}', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
