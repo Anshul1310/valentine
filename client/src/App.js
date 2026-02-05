@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import MobileGuard from './components/guards/MobileGuard';
-import ProtectedRoute from './components/guards/ProtectedRoute'; // Import the new guard
+import ProtectedRoute from './components/guards/ProtectedRoute'; 
 
 // Pages
 import Splash from './pages/Splash/Splash';
@@ -15,18 +15,26 @@ import Terms from './pages/Terms/Terms';
 
 function App() {
   return (
-    <MobileGuard>
-      <Router>
-        <Routes>
-          {/* --- PUBLIC ROUTES --- */}
-          {/* Accessible by anyone */}
+    <Router>
+      <Routes>
+        {/* --- EXCLUDED FROM MOBILE GUARD --- */}
+        {/* This route will work on Desktop and Mobile without the guard */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
+
+        {/* --- MOBILE GUARDED ROUTES --- */}
+        {/* Everything inside this Route wrapper gets the MobileGuard */}
+        <Route element={
+          <MobileGuard>
+            <Outlet />
+          </MobileGuard>
+        }>
+          
+          {/* Public Routes (Guarded) */}
           <Route path="/" element={<Splash />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* --- PROTECTED ROUTES --- */}
-          {/* Only accessible if logged in. Checks for token automatically. */}
+          {/* Protected Routes (Guarded) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/questions" element={<Questions />} />
             <Route path="/terms" element={<Terms />} />
@@ -35,9 +43,9 @@ function App() {
             <Route path="/chat" element={<Chat />} />
           </Route>
 
-        </Routes>
-      </Router>
-    </MobileGuard>
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
