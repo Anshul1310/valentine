@@ -1,29 +1,13 @@
-const mongoose = require('mongoose'); // <--- Added this import
+const mongoose = require('mongoose');
 const Confession = require('../models/Confession');
 
 // GET /api/confessions/quota
 exports.getQuota = async (req, res) => {
-  try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const count = await Confession.countDocuments({
-      author: req.user.id,
-      createdAt: { $gte: startOfDay, $lte: endOfDay }
-    });
-
-    const limit = 2;
-    res.status(200).json({ 
-      remaining: Math.max(0, limit - count),
-      limit: limit 
-    });
-  } catch (error) {
-    console.error("Quota Error:", error);
-    res.status(500).json({ message: "Error fetching quota" });
-  }
+  // UNLIMITED MODE: Always return a high number so the UI never blocks the input
+  res.status(200).json({ 
+    remaining: 9999,
+    limit: 9999 
+  });
 };
 
 // GET /api/confessions
@@ -34,7 +18,6 @@ exports.getConfessions = async (req, res) => {
         $addFields: {
           likesCount: { $size: "$likes" },
           commentsCount: { $size: "$comments" },
-          // Now 'mongoose' is defined, so this works:
           isLikedByMe: { $in: [new mongoose.Types.ObjectId(req.user.id), "$likes"] }
         }
       },
@@ -60,19 +43,8 @@ exports.createConfession = async (req, res) => {
   try {
     const { content } = req.body;
 
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const count = await Confession.countDocuments({
-      author: req.user.id,
-      createdAt: { $gte: startOfDay, $lte: endOfDay }
-    });
-
-    if (count >= 2) {
-      return res.status(403).json({ message: "Daily limit reached (2/2)." });
-    }
+    // --- REMOVED DAILY LIMIT CHECK ---
+    // Users can now post 'n' number of times.
 
     const newConfession = new Confession({
       author: req.user.id,

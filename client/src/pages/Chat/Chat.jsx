@@ -11,12 +11,14 @@ const Chat = () => {
   
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const mainContainerRef = useRef(null); // Ref for visual viewport fix
   const ws = useRef(null); 
   
   const navigate = useNavigate();
   const location = useLocation();
   const targetUser = location.state?.chatUser;
 
+  // --- Auth Logic ---
   const getCurrentUserId = () => {
     const token = localStorage.getItem('authToken');
     if (!token) return null;
@@ -41,7 +43,7 @@ const Chat = () => {
     avatar: `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`
   };
 
-  // --- Browser-Native Pop Sound (No File Needed) ---
+  // --- Sound Logic ---
   const playPopSound = () => {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -54,12 +56,10 @@ const Chat = () => {
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
 
-      // "Pop" effect: Frequency drops quickly
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(600, ctx.currentTime);
       oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
 
-      // Volume envelope: Fade out quickly
       gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
 
@@ -70,14 +70,13 @@ const Chat = () => {
     }
   };
 
-  // --- Fetch History ---
+  // --- History Logic ---
   const fetchHistory = useCallback(async (beforeTimestamp = null) => {
     if (!currentUserId || !chatUserId) return;
     
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
-      // Ensure your axios baseURL is also set to the domain, or use relative path if served from same origin
       let url = `/api/chat/history/${currentUserId}/${chatUserId}`;
       if (beforeTimestamp) {
         url += `?before=${beforeTimestamp}`;
@@ -124,16 +123,42 @@ const Chat = () => {
     }
   }, [messages.length, loading]); 
 
+  // --- KEYBOARD FIX: Visual Viewport Handler ---
+  useEffect(() => {
+    const handleResize = () => {
+      if (!mainContainerRef.current) return;
+      
+      // Get the actual visible height (Screen Height - Keyboard Height)
+      const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      
+      // Force the container to match this height
+      mainContainerRef.current.style.height = `${visualHeight}px`;
+
+      // Scroll to bottom to keep input visible
+      window.scrollTo(0, 0); 
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+      }, 100);
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      handleResize(); // Initialize
+    }
+
+    return () => {
+      if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   // --- WebSocket Logic ---
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
 
-    // HARDCODED DOMAIN: wss://benchbae.in
-    // Note: 'wss://' is required if your site is on HTTPS.
+    // HARDCODED DOMAIN
     ws.current = new WebSocket('wss://benchbae.in');
     
     ws.current.onopen = () => {
-      console.log("✅ WS Connected to benchbae.in");
       ws.current.send(JSON.stringify({ type: 'register', senderId: currentUserId }));
     };
 
@@ -150,7 +175,6 @@ const Chat = () => {
       };
       setMessages(prev => [...prev, newMessage]);
       
-      // Play sound if message is from 'them'
       if (!isSelf) {
         playPopSound();
       }
@@ -158,14 +182,6 @@ const Chat = () => {
       setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
-    };
-
-    ws.current.onerror = (error) => {
-      console.error("❌ WebSocket Error:", error);
-    };
-
-    ws.current.onclose = () => {
-      console.log("⚠️ WebSocket Disconnected");
     };
 
     return () => { if (ws.current) ws.current.close(); };
@@ -182,10 +198,13 @@ const Chat = () => {
         receiverId: chatUserId,
         text: inputText
       }));
-    } else {
-      console.warn("WebSocket not open. ReadyState:", ws.current?.readyState);
     }
     setInputText("");
+    
+    // Keep focus on input if desired, or let keyboard stay up
+    setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
   };
 
   const handleScroll = async () => {
@@ -206,7 +225,8 @@ const Chat = () => {
   if (!targetUser) return <div>Loading...</div>;
 
   return (
-    <div className={styles.container}>
+    // REF attached here for height resizing
+    <div className={styles.container} ref={mainContainerRef}>
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>←</button>
         <div className={styles.headerInfo}>
@@ -236,15 +256,19 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-     <form className={styles.footer} onSubmit={handleSend}>
-  <input 
-    className={styles.inputField}
-    placeholder="Type a message..."
-    value={inputText}
-    onChange={(e) => setInputText(e.target.value)}
-  />
-  <button type="submit" className={styles.sendBtn}>➤</button>
-</form>
+      <form className={styles.footer} onSubmit={handleSend}>
+        <input 
+          className={styles.inputField}
+          placeholder="Type a message..."
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onFocus={() => {
+             // Delay scroll to allow keyboard animation to start
+             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "auto" }), 300);
+          }}
+        />
+        <button type="submit" className={styles.sendBtn}>➤</button>
+      </form>
     </div>
   );
 };
