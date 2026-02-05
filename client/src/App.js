@@ -15,22 +15,26 @@ import Terms from './pages/Terms/Terms';
 function App() {
   return (
     <Router>
-      {/* --- GLOBAL MOBILE LAYOUT --- */}
-      {/* This outer div creates the gray background and centers the content */}
-      <div className="min-h-screen bg-gray-100 flex justify-center">
+      {/* GLOBAL BACKGROUND */}
+      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
         
-        {/* This inner div forces the 'Mobile App' width and height */}
-        <div className="w-full max-w-[430px] min-h-screen bg-white shadow-xl relative overflow-hidden">
-          
+        {/* MOBILE CONTAINER 
+          1. max-w-[430px]: Forces mobile width
+          2. transform: translateZ(0): THIS IS THE FIX. 
+             It creates a new "stacking context" that forces 'fixed' children 
+             (like headers or loaders) to stay inside this box.
+        */}
+        <div 
+          className="w-full max-w-[430px] h-[100dvh] bg-white shadow-2xl relative overflow-hidden"
+          style={{ transform: 'translateZ(0)' }} 
+        >
           <Routes>
             {/* --- PUBLIC ROUTES --- */}
             <Route path="/" element={<Splash />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/login" element={<Login />} />
             
-            {/* The AuthCallback is now inside the mobile layout container,
-               so it will remain mobile-sized while processing.
-            */}
+            {/* Now safe from expanding to desktop width */}
             <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* --- PROTECTED ROUTES --- */}
@@ -41,9 +45,7 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/chat" element={<Chat />} />
             </Route>
-
           </Routes>
-          
         </div>
       </div>
     </Router>
