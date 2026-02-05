@@ -25,7 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/confessions', confessionRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
-app.get('/{any}', (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
 // Database Connection
