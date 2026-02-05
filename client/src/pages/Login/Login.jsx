@@ -13,8 +13,8 @@ const Login = () => {
     const REDIRECT_URI = 'https://benchbae.in/auth/callback';
     console.log(CLIENT_ID)
     // 2. Redirect to Delta
-    // window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`;
-    console.log(`https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`)
+    window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`;
+    // console.log(`https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`)
   };
 
   return (
