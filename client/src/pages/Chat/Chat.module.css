@@ -1,20 +1,22 @@
-/* src/pages/Chat/Chat.module.css */
-
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: #f8f9fa;
-  font-family: var(--font-family);
+  height: 100vh; /* Full viewport height */
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  background-color: #f3f4f6;
+  position: relative;
+  overflow: hidden; /* Prevent body scroll */
 }
 
 /* --- Header --- */
 .header {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  background-color: var(--surface-color);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  padding: 15px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  flex-shrink: 0; /* Prevent header from shrinking */
   z-index: 10;
 }
 
@@ -22,9 +24,11 @@
   background: none;
   border: none;
   font-size: 24px;
-  margin-right: 15px;
+  color: #333;
   cursor: pointer;
-  color: var(--text-dark);
+  margin-right: 15px;
+  padding: 0;
+  line-height: 1;
 }
 
 .headerInfo {
@@ -34,12 +38,12 @@
 }
 
 .avatar {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  object-fit: cover;
   margin-right: 12px;
-  border: 2px solid #f3f4f6;
+  background-color: #eee;
+  object-fit: cover;
 }
 
 .nameCol {
@@ -48,15 +52,14 @@
 }
 
 .name {
+  font-weight: 600;
   font-size: 16px;
-  font-weight: 700;
-  color: var(--text-dark);
+  color: #111;
 }
 
 .status {
-  font-size: 11px;
-  color: #10b981;
-  font-weight: 600;
+  font-size: 12px;
+  color: #10b981; /* Green color for online */
   display: flex;
   align-items: center;
   gap: 4px;
@@ -73,22 +76,28 @@
 .messageList {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* Smooth scroll behavior */
-  scroll-behavior: smooth;
+  background-color: #f9fafb;
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.messageList::-webkit-scrollbar {
+  width: 4px;
+}
+.messageList::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 
 /* --- Message Bubbles --- */
 .messageRow {
   display: flex;
   width: 100%;
-  /* SMOOTHER ANIMATION HERE */
-  animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  opacity: 0;
-  transform: translateY(20px);
 }
 
 .sent {
@@ -101,94 +110,88 @@
 
 .bubble {
   max-width: 75%;
-  padding: 12px 18px;
-  border-radius: 20px;
+  padding: 10px 14px;
+  border-radius: 18px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.4;
   position: relative;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease;
+  word-wrap: break-word;
 }
 
-/* Sent Messages (Gradient Pink) */
 .sent .bubble {
-  background: var(--main-gradient);
-  color: var(--white);
+  background-color: #ff3366; /* Your brand color */
+  color: white;
   border-bottom-right-radius: 4px;
 }
 
-/* Received Messages (Soft Red/Pink Tint) */
 .received .bubble {
-  background-color: #fff0f3; /* Lightest Red/Pink */
-  color: #d63384; /* Deep Pink Text */
+  background-color: white;
+  color: #333;
   border-bottom-left-radius: 4px;
-  border: 1px solid rgba(255, 75, 110, 0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .timestamp {
+  display: block;
   font-size: 10px;
   margin-top: 4px;
-  display: block;
-  opacity: 0.7;
+  opacity: 0.8;
   text-align: right;
 }
 
-/* --- Footer Input --- */
+/* --- Footer (Input Area) --- */
 .footer {
-  padding: 15px 20px;
-  background-color: var(--surface-color);
-  display: flex;
+  padding: 10px 15px;
+  background-color: white;
+  border-top: 1px solid #eee;
+  display: flex;           /* Flexbox enables responsiveness */
   align-items: center;
-  gap: 12px;
-  border-top: 1px solid #f3f4f6;
+  gap: 10px;               /* Space between input and button */
+  flex-shrink: 0;          /* Prevent footer from collapsing */
+  padding-bottom: max(10px, env(safe-area-inset-bottom)); /* iOS safe area */
 }
 
 .inputField {
-  flex: 1;
-  padding: 14px 20px;
-  border-radius: 30px;
+  flex: 1;                 /* Takes up all remaining space */
+  width: 0;                /* Critical: allows input to shrink below its content size */
+  min-width: 0;            /* Fixes flexbox overflow issues */
+  padding: 12px 16px;
+  border-radius: 24px;
   border: 1px solid #e5e7eb;
   background-color: #f9fafb;
   font-size: 15px;
-  font-family: inherit;
   outline: none;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
 }
 
 .inputField:focus {
-  border-color: var(--primary-color);
-  background-color: var(--surface-color);
-  box-shadow: 0 0 0 4px rgba(255, 75, 110, 0.1);
+  border-color: #ff3366;
+  background-color: white;
 }
 
 .sendBtn {
-  width: 48px;
-  height: 48px;
+  flex-shrink: 0;          /* Prevents button from being squashed */
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: var(--primary-color);
+  background-color: #ff3366;
   color: white;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 18px;
   cursor: pointer;
-  font-size: 20px;
-  box-shadow: var(--shadow-glow);
-  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 2px 5px rgba(255, 51, 102, 0.3);
 }
 
 .sendBtn:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
+  background-color: #e61e50;
 }
 
-/* Smoother Spring Animation */
-@keyframes slideInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.sendBtn:disabled {
+  background-color: #fca5b9;
+  cursor: not-allowed;
 }

@@ -77,6 +77,7 @@ const Chat = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
+      // Ensure your axios baseURL is also set to the domain, or use relative path if served from same origin
       let url = `/api/chat/history/${currentUserId}/${chatUserId}`;
       if (beforeTimestamp) {
         url += `?before=${beforeTimestamp}`;
@@ -126,9 +127,13 @@ const Chat = () => {
   // --- WebSocket Logic ---
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
-    ws.current = new WebSocket('ws://localhost:5000');
+
+    // HARDCODED DOMAIN: wss://benchbae.in
+    // Note: 'wss://' is required if your site is on HTTPS.
+    ws.current = new WebSocket('wss://benchbae.in');
     
     ws.current.onopen = () => {
+      console.log("✅ WS Connected to benchbae.in");
       ws.current.send(JSON.stringify({ type: 'register', senderId: currentUserId }));
     };
 
@@ -155,6 +160,14 @@ const Chat = () => {
       }, 100);
     };
 
+    ws.current.onerror = (error) => {
+      console.error("❌ WebSocket Error:", error);
+    };
+
+    ws.current.onclose = () => {
+      console.log("⚠️ WebSocket Disconnected");
+    };
+
     return () => { if (ws.current) ws.current.close(); };
   }, [currentUserId, chatUserId]);
 
@@ -169,6 +182,8 @@ const Chat = () => {
         receiverId: chatUserId,
         text: inputText
       }));
+    } else {
+      console.warn("WebSocket not open. ReadyState:", ws.current?.readyState);
     }
     setInputText("");
   };
@@ -221,15 +236,15 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form className={styles.footer} onSubmit={handleSend}>
-        <input 
-          className={styles.inputField}
-          placeholder="Type a message..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-        <button type="submit" className={styles.sendBtn}>➤</button>
-      </form>
+     <form className={styles.footer} onSubmit={handleSend}>
+  <input 
+    className={styles.inputField}
+    placeholder="Type a message..."
+    value={inputText}
+    onChange={(e) => setInputText(e.target.value)}
+  />
+  <button type="submit" className={styles.sendBtn}>➤</button>
+</form>
     </div>
   );
 };
