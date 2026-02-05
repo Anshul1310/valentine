@@ -20,6 +20,13 @@ function App() {
         {/* --- EXCLUDED FROM MOBILE GUARD --- */}
         {/* This route will work on Desktop and Mobile without the guard */}
         <Route path="/auth/callback" element={<AuthCallback />} />
+         <Route element={<ProtectedRoute />}>
+            <Route path="/questions" element={<Questions />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/gender" element={<GenderSelect />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/chat" element={<Chat />} />
+          </Route>
 
         {/* --- MOBILE GUARDED ROUTES --- */}
         {/* Everything inside this Route wrapper gets the MobileGuard */}
@@ -35,13 +42,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           {/* Protected Routes (Guarded) */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/questions" element={<Questions />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/gender" element={<GenderSelect />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
-          </Route>
+         
 
         </Route>
       </Routes>
