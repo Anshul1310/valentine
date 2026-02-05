@@ -21,8 +21,8 @@ const Confessions = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [feedRes, quotaRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/confessions', { headers }),
-        axios.get('http://localhost:5000/api/confessions/quota', { headers })
+        axios.get('/api/confessions', { headers }),
+        axios.get('/api/confessions/quota', { headers })
       ]);
 
       setConfessions(feedRes.data);
@@ -40,7 +40,7 @@ const Confessions = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.post('http://localhost:5000/api/confessions', 
+      await axios.post('/api/confessions', 
         { content: newConfession },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -67,7 +67,7 @@ const Confessions = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.put(`http://localhost:5000/api/confessions/${id}/like`, {}, {
+      await axios.put(`/api/confessions/${id}/like`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Background refresh to ensure sync
