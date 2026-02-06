@@ -20,17 +20,6 @@ const questionsData = [
   {
     id: 2,
     type: 'selection',
-    text: "Choose your communication personality:",
-    description: "Select one.",
-    options: [
-      "Call Commander",
-      "Voice Note Ninja",
-      "Typing Titan"
-    ]
-  },
-  {
-    id: 3,
-    type: 'selection',
     text: "When are you most alive?",
     description: "Select one.",
     options: [
@@ -40,7 +29,7 @@ const questionsData = [
     ]
   },
   {
-    id: 4,
+    id: 3,
     type: 'selection',
     text: "What date appeals the most to you?",
     description: "Select one.",
@@ -52,7 +41,7 @@ const questionsData = [
     ]
   },
   {
-    id: 5,
+    id: 4,
     type: 'selection',
     text: "What's your comfort zone?",
     description: "Select one.",
@@ -68,7 +57,7 @@ const questionsData = [
     ]
   },
   {
-    id: 6,
+    id: 5,
     type: 'selection',
     text: "What attracts you the most?",
     description: "Select one.",
@@ -85,7 +74,7 @@ const questionsData = [
     ]
   },
   {
-    id: 7,
+    id: 6,
     type: 'selection',
     text: "What is your social personality closest to?",
     description: "Select one.",
@@ -100,7 +89,7 @@ const questionsData = [
     ]
   },
   {
-    id: 8,
+    id: 7,
     type: 'selection',
     text: "What does your ideal vacation look like?",
     description: "Select one.",
@@ -113,31 +102,12 @@ const questionsData = [
     ]
   },
   {
-    id: 9,
-    type: 'selection',
-    text: "What are your biggest turn offs?",
-    description: "Select one.",
-    options: [
-      "Ghosting",
-      "Disrespect",
-      "Dry replies",
-      "Over possessiveness",
-      "Emotional Unavailability",
-      "Raising voice"
-    ]
-  },
-  {
-
-    id: 10,
-
-    type: 'text', // Descriptive
-
-    text: "Which movie character resembles you the most?",
-
-    description: "Describe it in a few words.",
-
-    placeholder: "e.g., Ironman"
-
+    id: 8,
+    type: 'text',
+    text: "What is your biggest green and red flag?",
+    description: "150 character limit.",
+    placeholder: "Type your answer here...",
+    maxLength: 150
   },
 
 
