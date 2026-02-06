@@ -11,7 +11,7 @@ const Chat = () => {
   
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
-  const mainContainerRef = useRef(null); // Ref for visual viewport fix
+  const mainContainerRef = useRef(null);
   const ws = useRef(null); 
   
   const navigate = useNavigate();
@@ -128,26 +128,32 @@ const Chat = () => {
     const handleResize = () => {
       if (!mainContainerRef.current) return;
       
-      // Get the actual visible height (Screen Height - Keyboard Height)
+      // 1. Get the actual visible height (Screen Height - Keyboard Height)
       const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       
-      // Force the container to match this height
+      // 2. Force the container to match this height exactly
       mainContainerRef.current.style.height = `${visualHeight}px`;
 
-      // Scroll to bottom to keep input visible
+      // 3. Fix scroll offset of the page body
       window.scrollTo(0, 0); 
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-      }, 100);
+
+      // 4. Force messages to bottom immediately so they aren't hidden
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+      }
     };
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener('scroll', handleResize); // Handle scroll events too
       handleResize(); // Initialize
     }
 
     return () => {
-      if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.removeEventListener('scroll', handleResize);
+      }
     };
   }, []);
 
@@ -155,7 +161,6 @@ const Chat = () => {
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
 
-    // HARDCODED DOMAIN
     ws.current = new WebSocket('wss://benchbae.in');
     
     ws.current.onopen = () => {
@@ -201,7 +206,7 @@ const Chat = () => {
     }
     setInputText("");
     
-    // Keep focus on input if desired, or let keyboard stay up
+    // Scroll to bottom immediately
     setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 50);
@@ -225,7 +230,6 @@ const Chat = () => {
   if (!targetUser) return <div>Loading...</div>;
 
   return (
-    // REF attached here for height resizing
     <div className={styles.container} ref={mainContainerRef}>
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>←</button>
@@ -263,8 +267,8 @@ const Chat = () => {
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onFocus={() => {
-             // Delay scroll to allow keyboard animation to start
-             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "auto" }), 300);
+             // Delay to allow keyboard animation to finish, then scroll
+             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
           }}
         />
         <button type="submit" className={styles.sendBtn}>➤</button>

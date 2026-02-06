@@ -1,8 +1,12 @@
 .container {
   display: flex;
   flex-direction: column;
+  /* Use dvh to account for mobile browser address bars */
   height: 100vh;
+  height: 100dvh; 
   background-color: var(--bg-color);
+  /* Prevent the container itself from scrolling */
+  overflow: hidden; 
 }
 
 /* --- Header & Progress --- */
@@ -11,6 +15,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  /* Ensure header doesn't shrink */
+  flex-shrink: 0; 
 }
 
 .progressBar {
@@ -35,9 +41,12 @@
 .content {
   flex: 1;
   padding: 1rem 1.5rem;
-  overflow-y: auto;
+  /* Scroll happens HERE, inside the flex item */
+  overflow-y: auto; 
   display: flex;
   flex-direction: column;
+  /* Smooth scroll for better UX */
+  scroll-behavior: smooth; 
 }
 
 .questionTitle {
@@ -114,6 +123,10 @@
 .footer {
   padding: 1.5rem;
   background: var(--bg-color); 
+  /* Prevent footer from shrinking */
+  flex-shrink: 0; 
+  /* Add safe area for iPhones without home button */
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
 .nextButton {
