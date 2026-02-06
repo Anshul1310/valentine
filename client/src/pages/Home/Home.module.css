@@ -12,8 +12,8 @@
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
-  padding-bottom: 100px;
+  padding: 0; /* REMOVED padding to allow full-width headers in children */
+  padding-bottom: 100px; /* Ensures content isn't hidden behind the bottom nav */
 }
 
 /* --- Bottom Navigation --- */
@@ -42,7 +42,7 @@
   height: 100%;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative; /* Needed for absolute positioning of the dot */
+  position: relative;
   color: var(--text-light);
 }
 
@@ -61,12 +61,12 @@
 /* --- Notification Dot --- */
 .notificationDot {
   position: absolute;
-  top: 15px; /* Adjust based on icon verticality */
-  right: 28%; /* Center-ish to the right of the icon */
+  top: 15px;
+  right: 28%;
   width: 10px;
   height: 10px;
-  background-color: #FF3B30; /* Bright Red for alert */
-  border: 2px solid var(--surface-color); /* Cutout effect */
+  background-color: #FF3B30;
+  border: 2px solid var(--surface-color);
   border-radius: 50%;
   z-index: 10;
   animation: popIn 0.3s ease forwards;
@@ -87,7 +87,6 @@
   font-weight: 600;
 }
 
-/* The indicator dot below the active tab text */
 .activeNavItem::after {
   content: '';
   position: absolute;

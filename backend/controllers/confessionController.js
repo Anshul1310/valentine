@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); // <--- Added this import
+const mongoose = require('mongoose');
 const Confession = require('../models/Confession');
 
 // GET /api/confessions/quota
@@ -15,6 +15,7 @@ exports.getQuota = async (req, res) => {
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
+    // Limit is set to 2 here
     const limit = 2;
     res.status(200).json({ 
       remaining: Math.max(0, limit - count),
@@ -34,7 +35,7 @@ exports.getConfessions = async (req, res) => {
         $addFields: {
           likesCount: { $size: "$likes" },
           commentsCount: { $size: "$comments" },
-          // Now 'mongoose' is defined, so this works:
+          // Check if current user's ID is in the likes array
           isLikedByMe: { $in: [new mongoose.Types.ObjectId(req.user.id), "$likes"] }
         }
       },
@@ -65,11 +66,13 @@ exports.createConfession = async (req, res) => {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    // Check how many confessions the user has made today
     const count = await Confession.countDocuments({
       author: req.user.id,
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
+    // Enforce the limit
     if (count >= 2) {
       return res.status(403).json({ message: "Daily limit reached (2/2)." });
     }
@@ -123,6 +126,7 @@ exports.commentConfession = async (req, res) => {
 
     await confession.save();
     
+    // Return updated comments with populated author details
     const updated = await Confession.findById(req.params.id).populate('comments.author', 'name gender');
     res.status(200).json(updated.comments);
   } catch (error) {
