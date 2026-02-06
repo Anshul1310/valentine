@@ -125,7 +125,22 @@ const questionsData = [
       "Emotional Unavailability",
       "Raising voice"
     ]
-  }
+  },
+  {
+
+    id: 10,
+
+    type: 'text', // Descriptive
+
+    text: "Which movie character resembles you the most?",
+
+    description: "Describe it in a few words.",
+
+    placeholder: "e.g., Ironman"
+
+  },
+
+
 ];
 
 const Questions = () => {

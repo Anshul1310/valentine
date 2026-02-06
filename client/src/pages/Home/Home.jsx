@@ -7,6 +7,12 @@ import Profile from './Profile/Profile';
 import Invitations from './Invitations/Invitations';
 import Confessions from './Confessions/Confessions';
 
+import { ReactComponent as MessageIcon } from './icons/message.svg'; 
+import { ReactComponent as InvitationIcon } from './icons/invitation.svg';
+import { ReactComponent as MatchIcon } from './icons/matches.svg';
+import { ReactComponent as ConfessionIcon } from './icons/confession.svg';
+import { ReactComponent as ProfileIcon } from './icons/profile.svg';
+
 const Home = () => {
   const [activeTab, setActiveTab] = useState('matches');
   const [hasNotification, setHasNotification] = useState(false);
@@ -124,11 +130,11 @@ const Home = () => {
   };
 
   const tabs = [
-    { id: 'messages', label: 'Messages', icon: '💬' },
-    { id: 'invitations', label: 'Invitations', icon: '💌' },
+    { id: 'messages', label: 'Messages', icon: <MessageIcon/> },
+    { id: 'invitations', label: 'Invitations', icon: <InvitationIcon/> },
     { id: 'matches', label: 'Matches', icon: '🔥' },
-    { id: 'confessions', label: 'Confessions', icon: '🤫' },
-    { id: 'profile', label: 'Profile', icon: '👤' }
+    { id: 'confessions', label: 'Confessions', icon: <ConfessionIcon/> },
+    { id: 'profile', label: 'Profile', icon: <ProfileIcon/> }
   ];
 
   const renderContent = () => {

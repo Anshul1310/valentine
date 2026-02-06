@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Splash.module.css';
+import { ReactComponent as LogoIcon } from './../Home/icons/logoName.svg';
+
 
 const Splash = () => {
   const navigate = useNavigate();
@@ -50,7 +52,7 @@ const Splash = () => {
   return (
     <div className={styles.splashContainer}>
       <div className={styles.logoBox}>
-        <span>🔥</span>
+        <span><LogoIcon/></span>
       </div>
       <h1 className={styles.title}>MATCHED</h1>
     </div>
