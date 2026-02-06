@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
+
 import Messages from './Messages/Messages';
 import Matches from "./Matches/Matches";
 import Profile from './Profile/Profile';
 import Invitations from './Invitations/Invitations';
 import Confessions from './Confessions/Confessions';
 
-import { ReactComponent as MessageIcon } from './icons/message.svg'; 
-import { ReactComponent as InvitationIcon } from './icons/invitation.svg';
-import { ReactComponent as MatchIcon } from './icons/matches.svg';
-import { ReactComponent as ConfessionIcon } from './icons/confession.svg';
-import { ReactComponent as ProfileIcon } from './icons/profile.svg';
+import MessageIcon from './icons/message.svg';
+import MatchesIcon from './icons/matches.svg';
+import ProfileIcon from './icons/profile.svg';
+import ConfessionIcon from './icons/confession.svg';
+import InvitationIcon from './icons/invitation.svg';
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('matches');
@@ -130,11 +131,11 @@ const Home = () => {
   };
 
   const tabs = [
-    { id: 'messages', label: 'Messages', icon: <MessageIcon/> },
-    { id: 'invitations', label: 'Invitations', icon: <InvitationIcon/> },
-    { id: 'matches', label: 'Matches', icon: '🔥' },
-    { id: 'confessions', label: 'Confessions', icon: <ConfessionIcon/> },
-    { id: 'profile', label: 'Profile', icon: <ProfileIcon/> }
+    { id: 'messages', label: 'Messages', icon: <img src={MessageIcon} alt="Matched Logo" style={{ width: '30px', height: '30px'}}/> },
+    { id: 'invitations', label: 'Invitations', icon: <img src={InvitationIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/> },
+    { id: 'matches', label: 'Matches', icon: <img src={MatchesIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  },
+    { id: 'confessions', label: 'Confessions', icon: <img src={ConfessionIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  },
+    { id: 'profile', label: 'Profile', icon: <img src={ProfileIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  }
   ];
 
   const renderContent = () => {

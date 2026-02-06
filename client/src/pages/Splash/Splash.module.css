@@ -9,9 +9,8 @@
 }
 
 .logoBox {
-  width: 110px;
-  height: 110px;
-  background-color: var(--surface-color);
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   display: flex;
   align-items: center;
