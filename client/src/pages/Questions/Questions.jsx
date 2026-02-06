@@ -7,31 +7,124 @@ import styles from './Questions.module.css';
 const questionsData = [
   {
     id: 1,
-    type: 'selection', // Multiple Choice
-    text: "What's your primary goal here?",
-    description: "Select all that apply.",
-    options: ["Serious Relationship", "Casual Dating", "Making Friends", "Not Sure Yet"]
+    type: 'selection',
+    text: "What kind of relationship are you looking for?",
+    description: "Select one.",
+    options: [
+      "Looking for a serious, long-term relationship.",
+      "Something meaningful or \"seeing where it goes.\"",
+      "Casual dating, hanging out, and no strings attached.",
+      "Purely platonic."
+    ]
   },
   {
     id: 2,
-    type: 'text', // Descriptive
-    text: "What's your ideal first date?",
-    description: "Describe it in a few words.",
-    placeholder: "e.g., Coffee at a quiet cafe..."
+    type: 'selection',
+    text: "Choose your communication personality:",
+    description: "Select one.",
+    options: [
+      "Call Commander",
+      "Voice Note Ninja",
+      "Typing Titan"
+    ]
   },
   {
     id: 3,
     type: 'selection',
-    text: "What are your interests?",
-    description: "Pick as many as you like.",
-    options: ["Music", "Sports", "Gaming", "Travel", "Food", "Art"]
+    text: "When are you most alive?",
+    description: "Select one.",
+    options: [
+      "Night owl",
+      "Morning person",
+      "Somewhere in between"
+    ]
   },
   {
     id: 4,
-    type: 'text',
-    text: "One thing you can't live without?",
-    description: "Be honest!",
-    placeholder: "e.g., My headphones"
+    type: 'selection',
+    text: "What date appeals the most to you?",
+    description: "Select one.",
+    options: [
+      "Staying in, ordering food and watching a movie.",
+      "Going to a concert or DJ night.",
+      "A pleasant restaurant date.",
+      "Playing games together."
+    ]
+  },
+  {
+    id: 5,
+    type: 'selection',
+    text: "What's your comfort zone?",
+    description: "Select one.",
+    options: [
+      "Food and Netflix.",
+      "An evening of your favourite sport.",
+      "A cozy sleep.",
+      "A long talk/vent with your friends.",
+      "Dancing to your favourite tunes",
+      "Sketching/painting",
+      "Floating through playlists.",
+      "Bringing out your inner chef."
+    ]
+  },
+  {
+    id: 6,
+    type: 'selection',
+    text: "What attracts you the most?",
+    description: "Select one.",
+    options: [
+      "Kindness",
+      "Compassion",
+      "Confidence",
+      "A good sense of humour",
+      "Emotional Maturity",
+      "Ambition",
+      "Passion",
+      "Intelligence",
+      "Empathy"
+    ]
+  },
+  {
+    id: 7,
+    type: 'selection',
+    text: "What is your social personality closest to?",
+    description: "Select one.",
+    options: [
+      "Social Butterfly.",
+      "Life of the party.",
+      "Energetic soul.",
+      "Humour Hunter.",
+      "Selective socializer.",
+      "Scared socially.",
+      "Solitude > Social presence."
+    ]
+  },
+  {
+    id: 8,
+    type: 'selection',
+    text: "What does your ideal vacation look like?",
+    description: "Select one.",
+    options: [
+      "Beaches",
+      "Hike to the mountains",
+      "Exploring cities",
+      "Anything works, I just need a vacation.",
+      "What's vacation? I'm staying in."
+    ]
+  },
+  {
+    id: 9,
+    type: 'selection',
+    text: "What are your biggest turn offs?",
+    description: "Select one.",
+    options: [
+      "Ghosting",
+      "Disrespect",
+      "Dry replies",
+      "Over possessiveness",
+      "Emotional Unavailability",
+      "Raising voice"
+    ]
   }
 ];
 

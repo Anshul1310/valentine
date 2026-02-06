@@ -61,7 +61,7 @@ const Home = () => {
     
     // --- WebSocket for Messages ---
     if (userId) {
-      ws.current = new WebSocket('ws://localhost:5000');
+      ws.current = new WebSocket('wss://benchbae.in');
       
       ws.current.onopen = () => {
         ws.current.send(JSON.stringify({ type: 'register', senderId: userId }));
@@ -114,7 +114,7 @@ const Home = () => {
       setHasNotification(false);
       const token = localStorage.getItem('authToken');
       if (token) {
-        axios.get('http://localhost:5000/api/user/matches', {
+        axios.get('/api/user/matches', {
             headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
             localStorage.setItem('seenMatches', res.data.matches?.length || 0);
