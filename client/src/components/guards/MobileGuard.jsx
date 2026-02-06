@@ -2,20 +2,30 @@ import { useState, useEffect } from 'react';
 import styles from './MobileGuard.module.css';
 
 const MobileGuard = ({ children }) => {
-  // Allow if width is small OR if it's likely a mobile device (touch capable)
-  const isMobileDevice = () => {
-    return (
-      window.innerWidth < 768 || 
-      navigator.maxTouchPoints > 0 ||
-      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    );
+  const checkIsMobile = () => {
+    // 1. Standard check: Is the window narrow?
+    const isNarrowWindow = window.innerWidth < 768;
+    
+    // 2. Device check: Is the PHYSICAL screen small? (Remains true on mobile even in Desktop Mode)
+    const isSmallDevice = window.screen.width < 768;
+
+    // 3. Touch check: Does it have touch points? (Most desktops don't)
+    const isTouchDevice = navigator.maxTouchPoints > 0;
+
+    // Pass if ANY of these are true. 
+    // This allows "Desktop Mode" on mobile to still render the app.
+    return isNarrowWindow || isSmallDevice || isTouchDevice;
   };
 
-  const [isMobile, setIsMobile] = useState(isMobileDevice());
+  const [isMobile, setIsMobile] = useState(checkIsMobile());
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(isMobileDevice());
+    const handleResize = () => setIsMobile(checkIsMobile());
     window.addEventListener('resize', handleResize);
+    
+    // Check again on load just in case
+    handleResize();
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -24,12 +34,20 @@ const MobileGuard = ({ children }) => {
       <div className={styles.desktopWarning}>
         <h1>📱 Please switch to a mobile device.</h1>
         <p>This experience is designed for smaller screens.</p>
-        {/* OPTIONAL: Add a bypass button if the detection is wrong */}
+        {/* Fallback button in case detection still fails */}
         <button 
-            style={{ marginTop: '20px', padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#ff4b6e', color: 'white', fontWeight: 'bold' }}
-            onClick={() => setIsMobile(true)}
+          onClick={() => setIsMobile(true)}
+          style={{ 
+            marginTop: '1rem', 
+            padding: '10px 20px', 
+            background: '#ff4b6e', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '24px',
+            fontWeight: '600'
+          }}
         >
-            I am on Mobile (Continue)
+          I'm on Mobile (Continue)
         </button>
       </div>
     );

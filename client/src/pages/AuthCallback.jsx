@@ -16,8 +16,8 @@ const AuthCallback = () => {
 
       axios.post('/api/auth/dauth', { 
         code,
-        redirectUri: 'https://benchbae.in/auth/callback'
-       })
+        redirectUri: 'https://benchbae.in/auth/callback' 
+      })
         .then((res) => {
           const { token, user } = res.data;
           localStorage.setItem('authToken', token);
@@ -35,9 +35,9 @@ const AuthCallback = () => {
     }
   }, [searchParams, navigate]);
 
-  // Changed 100vh to 100% to fit the parent container
+  // Use 100% instead of 100vh to avoid viewport resize triggers
   return (
-    <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <h2>Verifying...</h2>
     </div>
   );
