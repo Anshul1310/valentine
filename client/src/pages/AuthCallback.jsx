@@ -14,7 +14,8 @@ const AuthCallback = () => {
     if (code && !codeProcessed.current) {
       codeProcessed.current = true;
 
-      axios.post('/api/auth/dauth', { code,
+      axios.post('/api/auth/dauth', { 
+        code,
         redirectUri: 'https://benchbae.in/auth/callback'
        })
         .then((res) => {
@@ -24,7 +25,6 @@ const AuthCallback = () => {
           if (user.onboardingComplete) {
             navigate('/terms');
           } else {
-            // New Flow: Always go to Gender first for setup
             navigate('/gender');
           }
         })
@@ -35,8 +35,9 @@ const AuthCallback = () => {
     }
   }, [searchParams, navigate]);
 
+  // Changed 100vh to 100% to fit the parent container
   return (
-    <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <h2>Verifying...</h2>
     </div>
   );
