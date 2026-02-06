@@ -22,14 +22,16 @@ const AuthCallback = () => {
           const { token, user } = res.data;
           localStorage.setItem('authToken', token);
           
+          // CHANGE: Use window.location.href instead of navigate to force a page refresh
           if (user.onboardingComplete) {
-            navigate('/terms');
+            window.location.href = '/terms';
           } else {
-            navigate('/gender');
+            window.location.href = '/gender';
           }
         })
         .catch((err) => {
           console.error("Login Failed", err);
+          // Optional: You can also use window.location.href here if you want a refresh on failure too
           navigate('/login');
         });
     }
