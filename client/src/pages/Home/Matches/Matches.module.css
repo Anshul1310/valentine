@@ -2,7 +2,8 @@
 .container {
   padding: 1.5rem;
   padding-bottom: 7rem;
-  background-color: var(--bg-color);
+  /* Updated background to match Confessions */
+  background: linear-gradient(135deg, #fff5f7 0%, #fff0f5 50%, #f0f7ff 100%);
   min-height: 100vh;
 }
 
@@ -342,4 +343,3 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-

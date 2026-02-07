@@ -1,3 +1,4 @@
+// client/src/pages/Chat/Chat.jsx
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -41,33 +42,6 @@ const Chat = () => {
     name: targetUser?.name || "Unknown",
     status: "Online",
     avatar: `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`
-  };
-
-  // --- Sound Logic ---
-  const playPopSound = () => {
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      
-      const ctx = new AudioContext();
-      const oscillator = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(ctx.destination);
-
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(600, ctx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
-
-      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + 0.1);
-    } catch (e) {
-      console.error("Audio play failed", e);
-    }
   };
 
   // --- History Logic ---
@@ -128,16 +102,11 @@ const Chat = () => {
     const handleResize = () => {
       if (!mainContainerRef.current) return;
       
-      // 1. Get the actual visible height (Screen Height - Keyboard Height)
       const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      
-      // 2. Force the container to match this height exactly
       mainContainerRef.current.style.height = `${visualHeight}px`;
 
-      // 3. Fix scroll offset of the page body
       window.scrollTo(0, 0); 
 
-      // 4. Force messages to bottom immediately so they aren't hidden
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "auto" });
       }
@@ -145,8 +114,8 @@ const Chat = () => {
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
-      window.visualViewport.addEventListener('scroll', handleResize); // Handle scroll events too
-      handleResize(); // Initialize
+      window.visualViewport.addEventListener('scroll', handleResize);
+      handleResize(); 
     }
 
     return () => {
@@ -180,9 +149,7 @@ const Chat = () => {
       };
       setMessages(prev => [...prev, newMessage]);
       
-      if (!isSelf) {
-        playPopSound();
-      }
+      // Removed PlayPopSound call here
 
       setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -206,7 +173,6 @@ const Chat = () => {
     }
     setInputText("");
     
-    // Scroll to bottom immediately
     setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 50);
@@ -267,7 +233,6 @@ const Chat = () => {
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onFocus={() => {
-             // Delay to allow keyboard animation to finish, then scroll
              setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
           }}
         />

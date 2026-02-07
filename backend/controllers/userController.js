@@ -1,5 +1,6 @@
 // backend/controllers/userController.js
 const User = require('../models/User');
+const Message = require('../models/Message');
 
 exports.getMe = async (req, res) => {
   try {
@@ -31,7 +32,6 @@ exports.saveAnswers = async (req, res) => {
   }
 };
 
-// --- NEW: Update Profile (Nickname & Avatar) ---
 exports.updateProfile = async (req, res) => {
   try {
     const { nickname, avatar } = req.body;
@@ -40,11 +40,10 @@ exports.updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Nickname and avatar are required" });
     }
 
-    // Update the 'name' field (used as nickname) and 'avatar'
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { name: nickname, avatar: avatar },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     res.status(200).json({
@@ -65,19 +64,49 @@ exports.updateProfile = async (req, res) => {
 
 exports.getMatches = async (req, res) => {
   try {
-    // 1. Fetch current user and populate lists with Avatar + Name
     const currentUser = await User.findById(req.user.id)
-      .populate('receivedRequests', 'name gender avatar answers') // Added avatar
-      .populate('sentRequests', 'name gender avatar answers')     // Added avatar
-      .populate('matches', 'name gender avatar');                 // Added avatar
+      .populate('receivedRequests', 'name gender avatar answers')
+      .populate('sentRequests', 'name gender avatar answers')
+      .populate('matches', 'name gender avatar');
 
-    // 2. Determine target gender for recommendations
+    // Fetch Last Message & Unread Count for Matches
+    const matchesWithMessages = await Promise.all(currentUser.matches.map(async (match) => {
+      // 1. Get Last Message
+      const lastMsg = await Message.findOne({
+        $or: [
+          { senderId: currentUser._id, receiverId: match._id },
+          { senderId: match._id, receiverId: currentUser._id }
+        ]
+      }).sort({ timestamp: -1 });
+
+      // 2. Count Unread Messages (Where I am the receiver and sender is the match)
+      const unreadCount = await Message.countDocuments({
+        senderId: match._id,
+        receiverId: currentUser._id,
+        isRead: false
+      });
+
+      return {
+        ...match.toObject(),
+        lastMessage: lastMsg ? lastMsg.text : "Tap to start chatting! 👋",
+        lastMessageTime: lastMsg ? lastMsg.timestamp : null,
+        unreadCount: unreadCount // Add count to response
+      };
+    }));
+    
+    // Sort matches by latest message time
+    matchesWithMessages.sort((a, b) => {
+      const timeA = a.lastMessageTime ? new Date(a.lastMessageTime) : 0;
+      const timeB = b.lastMessageTime ? new Date(b.lastMessageTime) : 0;
+      return timeB - timeA;
+    });
+
+    // Recommendation Logic (Standard)
     let targetGender;
     if (currentUser.gender === 'Man') targetGender = 'Woman';
     else if (currentUser.gender === 'Woman') targetGender = 'Man';
     else targetGender = ['Man', 'Woman', 'Non-binary'];
 
-    // 3. Exclude people we already know from recommendations
     const excludeIds = [
       currentUser._id,
       ...currentUser.sentRequests.map(u => u._id), 
@@ -85,14 +114,12 @@ exports.getMatches = async (req, res) => {
       ...currentUser.matches.map(u => u._id)
     ];
 
-    // 4. Find Candidates
     const candidates = await User.find({
       gender: targetGender,
       _id: { $nin: excludeIds },
       onboardingComplete: true
     });
 
-    // 5. Score Candidates (Common Interests)
     const mySelections = currentUser.answers
       .filter(a => a.questionType === 'selection')
       .flatMap(a => a.selectedOptions);
@@ -108,22 +135,20 @@ exports.getMatches = async (req, res) => {
         _id: user._id,
         name: user.name,
         gender: user.gender,
-        avatar: user.avatar,  // <--- Added Avatar here
+        avatar: user.avatar,
         matchCount: common.length,
         commonInterests: common.slice(0, 3),
         answers: user.answers 
       };
     });
 
-    // Sort by best match
     scoredCandidates.sort((a, b) => b.matchCount - a.matchCount);
 
-    // 6. Send Response
     res.status(200).json({
       pending: currentUser.receivedRequests, 
       sent: currentUser.sentRequests,
       recommendations: scoredCandidates,
-      matches: currentUser.matches 
+      matches: matchesWithMessages 
     });
 
   } catch (error) {
@@ -137,10 +162,7 @@ exports.sendInvite = async (req, res) => {
     const targetId = req.params.id;
     const currentId = req.user.id;
 
-    // Add target to my 'sentRequests'
     await User.findByIdAndUpdate(currentId, { $addToSet: { sentRequests: targetId } });
-    
-    // Add me to target's 'receivedRequests'
     await User.findByIdAndUpdate(targetId, { $addToSet: { receivedRequests: currentId } });
 
     res.status(200).json({ success: true, message: "Invitation sent" });
@@ -154,7 +176,6 @@ exports.acceptInvite = async (req, res) => {
     const requesterId = req.params.id; 
     const currentId = req.user.id;
 
-    // Add to 'matches' for both and remove from pending/sent lists
     await User.findByIdAndUpdate(currentId, { 
       $addToSet: { matches: requesterId },
       $pull: { receivedRequests: requesterId } 

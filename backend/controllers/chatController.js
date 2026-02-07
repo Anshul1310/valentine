@@ -4,10 +4,26 @@ const Message = require('../models/Message');
 exports.getMessages = async (req, res) => {
   try {
     const { user1, user2 } = req.params;
-    const { before } = req.query; // Timestamp cursor for pagination
+    const { before } = req.query;
 
-    // 1. Build Query
-    // Find messages between these two users (sent by either)
+    // 1. Mark messages as read
+    // If we have the current user's ID from auth middleware (req.user), 
+    // we can specifically mark messages sent by the 'other' person as read.
+    // Assuming user1 is the one requesting (or we check req.user.id)
+    
+    // Note: To be safe, we determine the "other" user.
+    // If the requester is user1, then user2 is the sender of unread messages.
+    // If req.user is available (which it should be via middleware):
+    if (req.user && req.user.id) {
+       const otherUserId = (req.user.id === user1) ? user2 : user1;
+       
+       await Message.updateMany(
+         { senderId: otherUserId, receiverId: req.user.id, isRead: false },
+         { $set: { isRead: true } }
+       );
+    }
+
+    // 2. Build Query
     let query = {
       $or: [
         { senderId: user1, receiverId: user2 },
@@ -15,20 +31,16 @@ exports.getMessages = async (req, res) => {
       ]
     };
 
-    // 2. Pagination Logic
-    // If 'before' is provided, fetch messages older than that timestamp
     if (before) {
       query.timestamp = { $lt: new Date(before) };
     }
 
     // 3. Fetch from DB
     const messages = await Message.find(query)
-      .sort({ timestamp: -1 }) // Get newest first (to grab the chunk)
-      .limit(20);              // Limit to 20
+      .sort({ timestamp: -1 }) 
+      .limit(20);              
 
     // 4. Reverse to Chronological Order
-    // We fetched "Newest -> Oldest" for efficient querying, 
-    // but the frontend needs "Oldest -> Newest" to display top-to-bottom.
     res.json(messages.reverse());
     
   } catch (error) {
