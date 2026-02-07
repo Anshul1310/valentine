@@ -7,7 +7,7 @@ import Onboarding from './pages/Onboarding/Onboarding';
 import Questions from './pages/Questions/Questions';
 import AuthCallback from './pages/AuthCallback';
 import Login from './pages/Login/Login';
-import GenderSelect from './pages/GenderSelect/GenderSelect';
+// GenderSelect removed
 import Home from './pages/Home/Home';
 import Chat from './pages/Chat/Chat';
 import Terms from './pages/Terms/Terms';
@@ -33,7 +33,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/questions" element={<Questions />} />
             <Route path="/terms" element={<Terms />} />
-            <Route path="/gender" element={<GenderSelect />} />
+            {/* Gender Route Removed */}
             <Route path="/home" element={<Home />} />
             <Route path="/chat" element={<Chat />} />
           </Route>

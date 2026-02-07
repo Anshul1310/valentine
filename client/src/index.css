@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  /* --- Brand Colors --- */
-  --primary-color: #ff4b6e;   /* The main Pink */
-  --secondary-color: #ff9e42; /* The Orange accent */
+  /* --- Brand Colors (Updated to Violet/Indigo) --- */
+  --primary-color: #7c3aed;   /* Violet 600 */
+  --secondary-color: #4f46e5; /* Indigo 600 */
   
   /* --- Functional Colors --- */
-  --bg-color: #f8f9fa;        /* Light grey background for the app */
-  --surface-color: #ffffff;   /* Pure white for cards/navbars */
+  --bg-color: #f8f9fa;        
+  --surface-color: #ffffff;   
   
   /* --- Typography Colors --- */
-  --text-dark: #1f2937;       /* Soft black for headings */
-  --text-medium: #4b5563;     /* Dark grey for body text */
-  --text-light: #9ca3af;      /* Light grey for placeholders/inactive */
+  --text-dark: #1f2937;       
+  --text-medium: #4b5563;     
+  --text-light: #9ca3af;      
   --white: #ffffff;
 
   /* --- Global Styles --- */
@@ -25,7 +25,10 @@
   --main-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 8px 20px rgba(255, 75, 110, 0.25); /* Pink glow */
+  /* Updated glow to match new primary color (Violet) */
+  --shadow-glow: 0 8px 20px rgba(124, 58, 237, 0.25); 
+  
+  /* Fix layout centering */
   width: 100%;
   height: 100%;
   display: flex;
@@ -53,14 +56,14 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
 }
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #f3f4f6; /* Gray background */
-  overflow: hidden; /* DISABLE scrolling on the body itself */
-  overscroll-behavior: none; /* Prevents "bounce" effect on Mac/iOS */
+  background-color: #f3f4f6;
+  overflow: hidden;
+  overscroll-behavior: none;
 }

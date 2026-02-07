@@ -14,10 +14,17 @@ const generateRandomNickname = () => {
 };
 
 const generateRandomAvatar = (gender) => {
-  // Generate a random seed based on gender preference or random
   const seed = Math.random().toString(36).substring(7);
-  // Using the same style as your frontend
   return `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`;
+};
+
+// Map Delta's "Male/Female" to App's "Man/Woman"
+const mapGender = (deltaGender) => {
+  if (!deltaGender) return 'Non-binary';
+  const g = deltaGender.toLowerCase();
+  if (g === 'male') return 'Man';
+  if (g === 'female') return 'Woman';
+  return 'Non-binary';
 };
 // ------------------------------------
 
@@ -31,7 +38,7 @@ exports.dauthLogin = async (req, res) => {
   try {
     // Step 1: Exchange Code for Token
     const tokenResponse = await axios.post(
-      'https://auth.delta.nitt.edu/api/oauth/token',
+      process.env.DAUTH_TOKEN_URL,
       new URLSearchParams({
         client_id: process.env.DAUTH_CLIENT_ID,
         client_secret: process.env.DAUTH_CLIENT_SECRET,
@@ -46,7 +53,7 @@ exports.dauthLogin = async (req, res) => {
 
     // Step 2: Get User Details
     const userResponse = await axios.post(
-      'https://auth.delta.nitt.edu/api/resources/user',
+      process.env.DAUTH_USER_URL,
       {},
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -57,16 +64,17 @@ exports.dauthLogin = async (req, res) => {
     let user = await User.findOne({ email: deltaUser.email });
 
     if (!user) {
-      // Create new user with RANDOM credentials
       const randomNick = generateRandomNickname();
+      // Ensure gender matches app format (Man/Woman)
+      const mappedGender = mapGender(deltaUser.gender);
       const randomAvatar = generateRandomAvatar(deltaUser.gender);
 
       user = await User.create({
-        name: randomNick,          // Storing random nickname instead of real name
+        name: randomNick,
         email: deltaUser.email,
         dauthId: deltaUser.id,
-        gender: deltaUser.gender,
-        avatar: randomAvatar,      // Store generated avatar
+        gender: mappedGender, // Saving mapped gender directly
+        avatar: randomAvatar,
         onboardingComplete: false
       });
     }
@@ -82,7 +90,7 @@ exports.dauthLogin = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name, // Returns the nickname
+        name: user.name,
         avatar: user.avatar,
         onboardingComplete: user.onboardingComplete
       }

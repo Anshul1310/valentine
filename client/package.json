@@ -1,7 +1,7 @@
 {
   "name": "valentine",
   "version": "0.1.0",
-  "proxy": "https://benchbae.in",
+  "proxy": "http://localhost:5000",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

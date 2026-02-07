@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styles from './Home.module.css';
 
+// ... (imports remain the same) ...
 import Messages from './Messages/Messages';
 import Matches from "./Matches/Matches";
 import Profile from './Profile/Profile';
@@ -19,6 +20,7 @@ const Home = () => {
   const [hasNotification, setHasNotification] = useState(false);
   const ws = useRef(null);
 
+  // ... (keep playPopSound, getCurrentUserId, and useEffects exactly as they are) ...
   // --- Browser-Native Pop Sound Utility ---
   const playPopSound = () => {
     try {
@@ -32,7 +34,6 @@ const Home = () => {
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
 
-      // "Pop" effect
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(600, ctx.currentTime);
       oscillator.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.1);
@@ -76,9 +77,7 @@ const Home = () => {
 
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        
         if (!data.isSelf) {
-          // If NOT on messages tab, show dot AND play sound
           if (activeTab !== 'messages') {
             setHasNotification(true);
             playPopSound();
@@ -99,7 +98,7 @@ const Home = () => {
 
         if (currentMatches > seenMatches) {
           setHasNotification(true);
-          playPopSound(); // Optional: Play sound on new match too
+          playPopSound();
         }
       } catch (error) {
         console.error("Error checking activity", error);
@@ -119,6 +118,7 @@ const Home = () => {
     setActiveTab(tabId);
     if (tabId === 'messages') {
       setHasNotification(false);
+      // ... same logic
       const token = localStorage.getItem('authToken');
       if (token) {
         axios.get('/api/user/matches', {
@@ -130,12 +130,13 @@ const Home = () => {
     }
   };
 
+  // Removed inline styles for icons to let CSS handle sizing
   const tabs = [
-    { id: 'messages', label: 'Messages', icon: <img src={MessageIcon} alt="Matched Logo" style={{ width: '30px', height: '30px'}}/> },
-    { id: 'invitations', label: 'Invitations', icon: <img src={InvitationIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/> },
-    { id: 'matches', label: 'Matches', icon: <img src={MatchesIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  },
-    { id: 'confessions', label: 'Confessions', icon: <img src={ConfessionIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  },
-    { id: 'profile', label: 'Profile', icon: <img src={ProfileIcon} alt="Matched Logo" style={{ width: '30px', height: '30px' }}/>  }
+    { id: 'messages', label: 'Messages', icon: <img src={MessageIcon} alt="Messages" /> },
+    { id: 'invitations', label: 'Invitations', icon: <img src={InvitationIcon} alt="Invitations" /> },
+    { id: 'matches', label: 'Matches', icon: <img src={MatchesIcon} alt="Matches" />  },
+    { id: 'confessions', label: 'Confessions', icon: <img src={ConfessionIcon} alt="Confessions" />  },
+    { id: 'profile', label: 'Profile', icon: <img src={ProfileIcon} alt="Profile" />  }
   ];
 
   const renderContent = () => {
@@ -162,10 +163,13 @@ const Home = () => {
             className={`${styles.navItem} ${activeTab === tab.id ? styles.activeNavItem : ''}`}
             onClick={() => handleTabChange(tab.id)}
           >
-            {tab.id === 'messages' && hasNotification && activeTab !== 'messages' && (
-              <span className={styles.notificationDot} />
-            )}
-            <span className={styles.icon}>{tab.icon}</span>
+            {/* Notification Dot REMOVED */}
+            
+            {/* Added iconContainer for the pill background effect */}
+            <div className={styles.iconContainer}>
+              <span className={styles.icon}>{tab.icon}</span>
+            </div>
+            
             <span className={styles.label}>{tab.label}</span>
           </div>
         ))}

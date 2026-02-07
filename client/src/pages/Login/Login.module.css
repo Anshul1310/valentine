@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: var(--bg-color); /* Uniform BG */
+  background-color: var(--bg-color);
   overflow: hidden;
   justify-content: center;
   align-items: center;
@@ -17,8 +17,8 @@
   right: -80px;
   width: 350px;
   height: 350px;
-  /* Use primary color with opacity for consistency */
-  background: radial-gradient(circle, rgba(255, 75, 110, 0.15) 0%, rgba(255,255,255,0) 70%);
+  /* Violet tint */
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, rgba(255,255,255,0) 70%);
   border-radius: 50%;
   z-index: 0;
 }
@@ -29,7 +29,8 @@
   left: -120px;
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, rgba(255, 158, 66, 0.12) 0%, rgba(255,255,255,0) 70%);
+  /* Indigo tint */
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.12) 0%, rgba(255,255,255,0) 70%);
   border-radius: 50%;
   z-index: 0;
 }
@@ -66,7 +67,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-md); /* Consistent shadow */
+  box-shadow: var(--shadow-md);
   animation: float 4s ease-in-out infinite;
 }
 
@@ -83,7 +84,7 @@
 .appName {
   font-size: 2.8rem;
   font-weight: 800;
-  color: var(--primary-color); /* Uniform Theme Color */
+  color: var(--primary-color); /* Now Violet */
   letter-spacing: -1px;
   margin: 0;
   line-height: 1.2;
@@ -111,7 +112,7 @@
   padding: 1.1rem;
   border: none;
   border-radius: var(--border-radius-lg);
-  background: var(--text-dark); /* Keeping black for high contrast */
+  background: var(--text-dark);
   color: var(--white);
   font-size: 1rem;
   font-weight: 600;

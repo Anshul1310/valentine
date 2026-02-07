@@ -16,28 +16,26 @@ const AuthCallback = () => {
 
       axios.post('/api/auth/dauth', { 
         code,
-        redirectUri: 'https://benchbae.in/auth/callback' 
+        redirectUri: process.env.REACT_APP_DAUTH_REDIRECT_URI 
       })
         .then((res) => {
           const { token, user } = res.data;
           localStorage.setItem('authToken', token);
           
-          // CHANGE: Use window.location.href instead of navigate to force a page refresh
           if (user.onboardingComplete) {
             window.location.href = '/terms';
           } else {
-            window.location.href = '/gender';
+            // DIRECTLY go to Questions, skipping Gender
+            window.location.href = '/questions';
           }
         })
         .catch((err) => {
           console.error("Login Failed", err);
-          // Optional: You can also use window.location.href here if you want a refresh on failure too
           navigate('/login');
         });
     }
   }, [searchParams, navigate]);
 
-  // Use 100% instead of 100vh to avoid viewport resize triggers
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <h2>Verifying...</h2>
