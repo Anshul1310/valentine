@@ -123,17 +123,17 @@ const Questions = () => {
   const currentQuestion = questionsData[currentIndex];
   const currentAnswer = answers[currentQuestion.id];
 
-  // Handle Selection (Array)
+  // --- MODIFIED SECTION START ---
+  // Handle Selection (Single Option Enforced)
   const handleSelect = (option) => {
-    setAnswers(prev => {
-      const existing = Array.isArray(prev[currentQuestion.id]) ? prev[currentQuestion.id] : [];
-      if (existing.includes(option)) {
-        return { ...prev, [currentQuestion.id]: existing.filter(item => item !== option) };
-      } else {
-        return { ...prev, [currentQuestion.id]: [...existing, option] };
-      }
-    });
+    setAnswers(prev => ({
+      ...prev,
+      // We set the value to a new array containing ONLY the selected option.
+      // This overwrites any previous selection.
+      [currentQuestion.id]: [option]
+    }));
   };
+  // --- MODIFIED SECTION END ---
 
   // Handle Text Input (String)
   const handleTextChange = (e) => {
