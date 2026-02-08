@@ -8,8 +8,8 @@ const slides = [
   {
     id: 1,
     image: "https://res.cloudinary.com/dbxtgjwyv/image/upload/v1770531802/one_rbhl9j.png", // 3D Couple illustration
-    title: "Find your partner with us",
-    desc: "We know it can be shy to socialize with the opposite gender. That's exactly why we built the perfect solution for you."
+    title: "Find your partner",
+    desc: "That's exactly why we built the perfect solution for you."
   },
   {
     id: 2,
@@ -20,8 +20,8 @@ const slides = [
   {
     id: 3,
     image: "https://res.cloudinary.com/dbxtgjwyv/image/upload/v1770532337/three_s3elmm.png", 
-    title: "End to End encrypted chats!",
-    desc: "Don't worry for your messages, We have your back with end to end encryption for messages"
+    title: "Encrypted chats!",
+    desc: "End to end encryption for messages nobody can break"
   }
 ];
 

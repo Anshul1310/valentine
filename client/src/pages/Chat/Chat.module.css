@@ -4,9 +4,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  /* Visual Viewport logic in JS will handle the height dynamically */
-  height: 100vh; 
-  height: 100dvh;
+  /* Change to 100% to fill the App parent, JS handles visualViewport */
+  height: 100%; 
   position: relative;
   overflow: hidden; 
   /* Prevent 'rubber band' effect on iOS */
@@ -28,6 +27,8 @@
   z-index: -1;
   pointer-events: none;
 }
+
+/* ... (Keep the rest of the CSS exactly as it was) ... */
 
 /* --- Header --- */
 .header {
