@@ -4,6 +4,29 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import MobileGuard from './components/guards/MobileGuard';
+import axios from 'axios';
+
+// --- Global Axios Interceptor ---
+// This ensures that if ANY request fails due to invalid token/user (401/404),
+// the user is immediately logged out and sent to onboarding.
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 404)) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        console.warn("Session invalid or user not found. Logging out.");
+        localStorage.removeItem('authToken');
+        
+        // Force redirect if not already on onboarding
+        if (!window.location.pathname.includes('/onboarding')) {
+          window.location.href = '/onboarding';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
