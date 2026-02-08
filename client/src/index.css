@@ -1,9 +1,10 @@
+/* client/src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-  /* --- Brand Colors (Updated to Violet/Indigo) --- */
-  --primary-color: #7c3aed;   /* Violet 600 */
-  --secondary-color: #4f46e5; /* Indigo 600 */
+  /* --- Brand Colors --- */
+  --primary-color: #7c3aed;   
+  --secondary-color: #4f46e5; 
   
   /* --- Functional Colors --- */
   --bg-color: #f8f9fa;        
@@ -25,14 +26,7 @@
   --main-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  /* Updated glow to match new primary color (Violet) */
   --shadow-glow: 0 8px 20px rgba(124, 58, 237, 0.25); 
-  
-  /* Fix layout centering */
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 * {
@@ -49,21 +43,27 @@
   background: transparent !important;
 }
 
-body {
-  font-family: var(--font-family);
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* Ensure html/body take full viewport */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   background-color: #f3f4f6;
-  overflow: hidden;
+  overflow: hidden; /* Prevent body scroll */
   overscroll-behavior: none;
+  font-family: var(--font-family);
+  color: var(--text-dark);
+}
+
+/* CRITICAL FIX: 
+   Target the React root div directly.
+   This ensures the app container fills the screen exactly 
+   and doesn't grow beyond it.
+*/
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center; /* Centers the mobile-width app on desktop */
 }
