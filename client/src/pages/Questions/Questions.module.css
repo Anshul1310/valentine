@@ -3,22 +3,23 @@
 .container {
   display: flex;
   flex-direction: column;
-  /* Ensure it fills the parent exactly */
-  height: 100%; 
+  /* Fill the App container exactly */
+  height: 100%;
   width: 100%;
-  background-color: #ffffff; 
-  overflow: hidden; 
+  background-color: #ffffff;
+  overflow: hidden; /* Prevent the container itself from scrolling */
   position: relative;
 }
 
-/* --- Header & Progress --- */
+/* --- Header --- */
+/* Stays fixed at the top */
 .header {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   flex-shrink: 0; 
-  background-color: #ffffff; 
+  background-color: #ffffff;
   z-index: 10;
 }
 
@@ -31,27 +32,29 @@
 
 .progressSegment {
   flex: 1;
-  background-color: #f3f4f6; 
+  background-color: #f3f4f6;
   border-radius: 10px;
   transition: background-color 0.4s ease;
 }
 
 .activeSegment {
-  background-color: #ff4b6e; 
+  background-color: #ff4b6e;
 }
 
-/* --- Main Content --- */
+/* --- Main Content (SCROLLABLE AREA) --- */
 .content {
-  flex: 1; /* Takes all available space */
+  flex: 1; /* Grow to fill all available space between header and footer */
   padding: 1rem 1.5rem;
-  overflow-y: auto; /* Internal scrolling happens HERE */
+  
+  /* This makes ONLY this section scroll */
+  overflow-y: auto; 
+  
   display: flex;
   flex-direction: column;
-  scroll-behavior: smooth; 
-  background-color: #f8f9fa; 
+  background-color: #f8f9fa;
   
-  /* Extra padding at bottom so content doesn't get stuck behind footer visually */
-  padding-bottom: 120px; 
+  /* Add padding at bottom so content doesn't touch the edge when scrolled */
+  padding-bottom: 2rem;
 }
 
 .questionTitle {
@@ -76,7 +79,7 @@
 }
 
 .optionCard {
-  background: #ffffff; 
+  background: #ffffff;
   border: 2px solid transparent;
   border-radius: 16px;
   padding: 1.25rem;
@@ -87,7 +90,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   font-family: inherit;
 }
 
@@ -124,18 +127,23 @@
   color: #9ca3af;
 }
 
-/* --- Footer --- */
+/* --- Footer (FIXED AT BOTTOM) --- */
 .footer {
   padding: 1.5rem;
-  background: #ffffff; 
+  background: #ffffff;
+  
+  /* Prevent footer from shrinking */
   flex-shrink: 0; 
-  /* Increased safe-area padding to ensure button is high enough */
-  padding-bottom: max(2rem, env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(0,0,0,0.02); 
-  position: relative;
+  
+  /* Ensure it sits above content */
   z-index: 20;
-  /* Shadow to separate from content */
+  
+  /* Visual separation */
+  border-top: 1px solid rgba(0,0,0,0.02);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+  
+  /* Handle iPhone Home Bar */
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
 .nextButton {

@@ -12,12 +12,11 @@ import Home from './pages/Home/Home';
 import Chat from './pages/Chat/Chat';
 import Terms from './pages/Terms/Terms';
 
-// Layout component to handle conditional scrolling
 const Layout = ({ children }) => {
   const location = useLocation();
   
-  // Define routes that should NOT scroll at the window level
-  // (because they handle their own internal scrolling)
+  // List of routes where the page body should NOT scroll.
+  // We want the internal components (like Chat list or Questions list) to scroll instead.
   const lockScrollRoutes = ['/chat', '/questions'];
   const shouldLockScroll = lockScrollRoutes.includes(location.pathname);
 
