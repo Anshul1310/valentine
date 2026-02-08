@@ -174,7 +174,7 @@ const Questions = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        navigate('/terms');
+        navigate('/terms', { replace: true });
 
       } catch (error) {
         console.error("Failed to save answers", error);
