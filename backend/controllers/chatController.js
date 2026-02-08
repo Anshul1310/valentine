@@ -1,4 +1,5 @@
 // backend/controllers/chatController.js
+// backend/controllers/chatController.js
 const Message = require('../models/Message');
 
 exports.getMessages = async (req, res) => {
@@ -6,42 +7,64 @@ exports.getMessages = async (req, res) => {
     const { user1, user2 } = req.params;
     const { before } = req.query;
 
-    // 1. Mark messages as read
-    // If we have the current user's ID from auth middleware (req.user), 
-    // we can specifically mark messages sent by the 'other' person as read.
-    // Assuming user1 is the one requesting (or we check req.user.id)
-    
-    // Note: To be safe, we determine the "other" user.
-    // If the requester is user1, then user2 is the sender of unread messages.
-    // If req.user is available (which it should be via middleware):
-    if (req.user && req.user.id) {
-       const otherUserId = (req.user.id === user1) ? user2 : user1;
-       
-       await Message.updateMany(
-         { senderId: otherUserId, receiverId: req.user.id, isRead: false },
-         { $set: { isRead: true } }
-       );
+    // Identify current user and the "other" user
+    // req.user is provided by the 'protect' middleware
+    const currentUserId = req.user ? req.user.id : null;
+    let otherUserId;
+
+    // Determine otherUserId based on the route params
+    if (currentUserId === user1) {
+      otherUserId = user2;
+    } else if (currentUserId === user2) {
+      otherUserId = user1;
+    } else {
+      // Fallback if current user isn't in the params (shouldn't happen with correct routing)
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
-    // 2. Build Query
-    let query = {
+    // 1. Build the base query for the conversation
+    const query = {
       $or: [
         { senderId: user1, receiverId: user2 },
         { senderId: user2, receiverId: user1 }
       ]
     };
 
+    // 2. Count unread messages (ONLY for the initial load, i.e., when 'before' is not set)
+    let unreadCount = 0;
+    if (!before && currentUserId) {
+      unreadCount = await Message.countDocuments({
+        senderId: otherUserId,
+        receiverId: currentUserId,
+        isRead: false
+      });
+
+      // 3. Mark messages as read immediately after counting
+      if (unreadCount > 0) {
+        await Message.updateMany(
+          { senderId: otherUserId, receiverId: currentUserId, isRead: false },
+          { $set: { isRead: true } }
+        );
+      }
+    }
+
+    // 4. Add pagination to the query
+    // If 'before' exists, we want messages strictly OLDER than that timestamp
     if (before) {
       query.timestamp = { $lt: new Date(before) };
     }
 
-    // 3. Fetch from DB
+    // 5. Fetch messages (newest first, then reverse)
     const messages = await Message.find(query)
-      .sort({ timestamp: -1 }) 
-      .limit(20);              
+      .sort({ timestamp: -1 }) // Newest first
+      .limit(20);              // Limit to 20
 
-    // 4. Reverse to Chronological Order
-    res.json(messages.reverse());
+    // 6. Return formatted response
+    // We reverse the array so the frontend gets them in chronological order [Oldest ... Newest]
+    res.json({
+      messages: messages.reverse(),
+      unreadCount: unreadCount // Include the count we found earlier
+    });
     
   } catch (error) {
     console.error("Error fetching messages:", error);

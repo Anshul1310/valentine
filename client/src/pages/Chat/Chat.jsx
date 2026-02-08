@@ -4,22 +4,37 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Chat.module.css';
 
+// --- Dynamic WebSocket URL ---
+const WS_URL = process.env.REACT_APP_WS_URL || 'wss://benchbae.in';
+
+const formatDate = (date) => {
+  const d = new Date(date);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (d.toDateString() === today.toDateString()) return "Today";
+  if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
+  return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+};
+
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0); 
   
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const mainContainerRef = useRef(null);
   const ws = useRef(null); 
-  
+  const isFetchingRef = useRef(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const targetUser = location.state?.chatUser;
 
-  // --- Auth Logic ---
   const getCurrentUserId = () => {
     const token = localStorage.getItem('authToken');
     if (!token) return null;
@@ -44,11 +59,12 @@ const Chat = () => {
     avatar: `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`
   };
 
-  // --- History Logic ---
   const fetchHistory = useCallback(async (beforeTimestamp = null) => {
-    if (!currentUserId || !chatUserId) return;
+    if (!currentUserId || !chatUserId || isFetchingRef.current) return;
     
+    isFetchingRef.current = true;
     setLoading(true);
+
     try {
       const token = localStorage.getItem('authToken');
       let url = `/api/chat/history/${currentUserId}/${chatUserId}`;
@@ -60,30 +76,44 @@ const Chat = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (data.length < 20) {
+      const fetchedMessages = data.messages || [];
+      const count = data.unreadCount || 0;
+
+      if (fetchedMessages.length < 20) {
         setHasMore(false);
       }
 
-      const formattedMessages = data.map(msg => ({
+      const formattedMessages = fetchedMessages.map(msg => ({
         id: msg._id,
         text: msg.text,
         sender: msg.senderId === currentUserId ? "me" : "them",
         timestamp: msg.timestamp,
-        time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: new Date(msg.timestamp).toDateString()
       }));
 
-      setMessages(prev => {
-        if (!beforeTimestamp) {
-          return formattedMessages;
-        } else {
-          return [...formattedMessages, ...prev];
-        }
-      });
+      if (!beforeTimestamp) {
+        setMessages(formattedMessages);
+        setUnreadCount(count);
+        setTimeout(() => scrollToBottom("auto"), 100);
+      } else {
+        const container = chatContainerRef.current;
+        const previousScrollHeight = container.scrollHeight;
+
+        setMessages(prev => [...formattedMessages, ...prev]);
+
+        requestAnimationFrame(() => {
+            if(container) {
+                container.scrollTop = container.scrollHeight - previousScrollHeight;
+            }
+        });
+      }
 
     } catch (error) {
       console.error("Failed to load chat history", error);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, [currentUserId, chatUserId]);
 
@@ -91,24 +121,31 @@ const Chat = () => {
     fetchHistory();
   }, [fetchHistory]);
 
-  useEffect(() => {
-    if (!loading && messages.length <= 20) {
-         messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-    }
-  }, [messages.length, loading]); 
+  const scrollToBottom = (behavior = "auto") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
 
-  // --- KEYBOARD FIX: Visual Viewport Handler ---
+  const handleScroll = async () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    if (container.scrollTop === 0 && hasMore && !loading && !isFetchingRef.current) {
+        const oldestMessage = messages[0];
+        if (oldestMessage) {
+            await fetchHistory(oldestMessage.timestamp);
+        }
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
       if (!mainContainerRef.current) return;
-      
       const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       mainContainerRef.current.style.height = `${visualHeight}px`;
-
-      window.scrollTo(0, 0); 
-
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+      
+      if (chatContainerRef.current) {
+          const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+          const isAtBottom = scrollHeight - scrollTop === clientHeight;
+          if(isAtBottom) scrollToBottom("auto");
       }
     };
 
@@ -130,7 +167,8 @@ const Chat = () => {
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
 
-    ws.current = new WebSocket('wss://benchbae.in');
+    // Use Dynamic URL
+    ws.current = new WebSocket(WS_URL);
     
     ws.current.onopen = () => {
       ws.current.send(JSON.stringify({ type: 'register', senderId: currentUserId }));
@@ -138,22 +176,20 @@ const Chat = () => {
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      const isSelf = (data.isSelf || data.senderId === currentUserId);
-      
+      const isSelf = (data.senderId === currentUserId);
+      if (isSelf) return; 
+
       const newMessage = {
         id: Date.now(),
         text: data.text,
-        sender: isSelf ? "me" : "them",
+        sender: "them",
         timestamp: data.timestamp,
-        time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: new Date(data.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: new Date(data.timestamp || Date.now()).toDateString()
       };
-      setMessages(prev => [...prev, newMessage]);
-      
-      // Removed PlayPopSound call here
 
-      setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      setMessages(prev => [...prev, newMessage]);
+      setTimeout(() => scrollToBottom("smooth"), 100);
     };
 
     return () => { if (ws.current) ws.current.close(); };
@@ -163,34 +199,52 @@ const Chat = () => {
     e.preventDefault();
     if (!inputText.trim() || !currentUserId) return;
 
+    const timestamp = Date.now();
+    const textToSend = inputText;
+    
+    const tempMessage = {
+      id: timestamp,
+      text: textToSend,
+      sender: "me",
+      timestamp: timestamp,
+      time: new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date(timestamp).toDateString()
+    };
+    
+    setMessages(prev => [...prev, tempMessage]);
+    setInputText("");
+    setUnreadCount(0);
+    
+    setTimeout(() => scrollToBottom("smooth"), 50);
+
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({
         type: 'message',
         senderId: currentUserId,
         receiverId: chatUserId,
-        text: inputText
+        text: textToSend
       }));
     }
-    setInputText("");
-    
-    setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
   };
 
-  const handleScroll = async () => {
-    const container = chatContainerRef.current;
-    if (!container) return;
-    if (container.scrollTop === 0 && hasMore && !loading) {
-      const oldScrollHeight = container.scrollHeight;
-      const oldestMessage = messages[0];
-      if (oldestMessage) {
-        await fetchHistory(oldestMessage.timestamp);
-        requestAnimationFrame(() => {
-          container.scrollTop = container.scrollHeight - oldScrollHeight;
-        });
-      }
-    }
+  const renderMessages = () => {
+    let lastDate = null;
+    return messages.map((msg, index) => {
+      const showDate = msg.date !== lastDate;
+      lastDate = msg.date;
+      
+      return (
+        <div key={msg.id || index}>
+          {showDate && <div className={styles.dateSeparator}>{formatDate(msg.timestamp)}</div>}
+          <div className={`${styles.messageRow} ${msg.sender === 'me' ? styles.sent : styles.received}`}>
+            <div className={styles.bubble}>
+              {msg.text}
+              <span className={styles.timestamp}>{msg.time}</span>
+            </div>
+          </div>
+        </div>
+      );
+    });
   };
 
   if (!targetUser) return <div>Loading...</div>;
@@ -198,7 +252,9 @@ const Chat = () => {
   return (
     <div className={styles.container} ref={mainContainerRef}>
       <div className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>←</button>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+             <span style={{fontSize:'24px'}}>←</span>
+        </button>
         <div className={styles.headerInfo}>
           <img src={chatUserDisplay.avatar} alt="Avatar" className={styles.avatar} />
           <div className={styles.nameCol}>
@@ -208,21 +264,27 @@ const Chat = () => {
         </div>
       </div>
 
+      {unreadCount > 0 && (
+        <div style={{
+            backgroundColor: '#ffebf0', 
+            color: '#ff4b6e', 
+            textAlign: 'center', 
+            fontSize: '12px', 
+            padding: '8px',
+            fontWeight: '600',
+            borderBottom: '1px solid #ffcad4'
+        }}>
+            {unreadCount} Unread Messages
+        </div>
+      )}
+
       <div 
         className={styles.messageList} 
         ref={chatContainerRef}
         onScroll={handleScroll}
       >
-        {loading && hasMore && <div style={{textAlign:'center', fontSize:'12px', color:'#888'}}>Loading history...</div>}
-
-        {messages.map((msg, index) => (
-          <div key={msg.id || index} className={`${styles.messageRow} ${msg.sender === 'me' ? styles.sent : styles.received}`}>
-            <div className={styles.bubble}>
-              {msg.text}
-              <span className={styles.timestamp}>{msg.time}</span>
-            </div>
-          </div>
-        ))}
+        {loading && hasMore && <div className={styles.loadingHistory}>Loading history...</div>}
+        {renderMessages()}
         <div ref={messagesEndRef} />
       </div>
 
@@ -232,11 +294,11 @@ const Chat = () => {
           placeholder="Type a message..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onFocus={() => {
-             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
-          }}
+          onFocus={() => setTimeout(() => scrollToBottom("smooth"), 300)}
         />
-        <button type="submit" className={styles.sendBtn}>➤</button>
+        <button type="submit" className={styles.sendBtn} disabled={!inputText.trim()}>
+          ➤
+        </button>
       </form>
     </div>
   );

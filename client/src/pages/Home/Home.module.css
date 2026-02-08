@@ -4,9 +4,9 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff; /* Ensure white background */
+  background-color: #ffffff; 
   font-family: 'Poppins', sans-serif;
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden; 
 }
 
 /* --- Content Area --- */
@@ -14,8 +14,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 0;
-  padding-bottom: 100px; /* Space for the bottom nav */
-  background: #f8f9fa; /* Slight off-white for content contrast */
+  padding-bottom: 100px; 
+  background: #f8f9fa; 
 }
 
 /* --- Bottom Navigation --- */
@@ -23,7 +23,7 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  max-width: 430px; /* Match the App.js max-width */
+  max-width: 430px; 
   height: 80px;
   background-color: #ffffff;
   display: flex;
@@ -31,7 +31,7 @@
   align-items: center;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
   z-index: 1000;
-  padding-bottom: 10px; /* Safe area for mobile gestures */
+  padding-bottom: 10px; 
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   border: 1px solid rgba(0, 0, 0, 0.02);
@@ -47,7 +47,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  color: #9ca3af; /* Inactive grey */
+  color: #9ca3af; 
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -60,6 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative; /* Needed for badge absolute positioning */
 }
 
 .icon {
@@ -71,11 +72,9 @@
   transition: transform 0.2s ease;
 }
 
-/* Fix for SVG/Image coloring */
 .icon img {
   width: 100%;
   height: 100%;
-  /* Default inactive filter (greyish) */
   filter: grayscale(100%) opacity(0.5); 
   transition: filter 0.3s ease;
 }
@@ -89,20 +88,43 @@
 
 /* --- Active State --- */
 .activeNavItem .iconContainer {
-  /* Soft background pill for active state */
   background-color: rgba(255, 59, 143, 0.1); 
 }
 
 .activeNavItem .icon img {
-  /* Restore original color or force theme color */
   filter: grayscale(0%) opacity(1) drop-shadow(0 2px 4px rgba(255, 59, 143, 0.2));
   transform: scale(1.1);
 }
 
 .activeNavItem .label {
-  color: #FF3B8F; /* Theme Pink */
+  color: #FF3B8F; 
   font-weight: 700;
   opacity: 1;
 }
 
-/* Remove the old dot logic completely from CSS */
+/* --- Notification Badge --- */
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 12px; 
+  background-color: #ff4b6e;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  min-width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 2px solid white;
+  padding: 0 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}

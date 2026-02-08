@@ -2,33 +2,41 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require("path");
 const { WebSocketServer } = require('ws'); 
-const Message = require('./models/Message'); 
 require('dotenv').config();
 
+// Models
+const Message = require('./models/Message'); 
+
+// Routes
 const authRoutes = require('./routes/authRoutes');
 const confessionRoutes = require('./routes/confessionRoutes');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
-const path=require("path")
-app.use(cors({ origin: '*' }));app.use(express.json());
+
+// --- Middleware ---
+app.use(cors({ origin: '*' }));
+app.use(express.json());
+
+// --- Static Files (React Build) ---
 const buildPath = path.join(__dirname, '../client/build');
 app.use(express.static(buildPath));
 
-// 3. The "Catch-All" Route (Critical for React Router)
-// This fixes the "404 Not Found" error when you refresh the page on /chat or /profile
-
-// Routes
+// --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/confessions', confessionRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
+
+// --- Catch-All Route for React Router ---
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
-// Database Connection
+
+// --- Database Connection ---
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ DB Error:', err));
@@ -41,8 +49,8 @@ const server = app.listen(PORT, () => console.log(`🚀 Server running on port $
 // 2. Initialize WebSocket Server
 const wss = new WebSocketServer({ server });
 
-// CHANGED: Use a Set to allow multiple connections (tabs/components) per user
-const clients = new Map(); // Key: userId, Value: Set<WebSocket>
+// Client Tracking: Key = userId, Value = Set of WebSockets (for multiple tabs)
+const clients = new Map(); 
 
 wss.on('connection', (ws, req) => {
   console.log('🔌 New Client Connected');
@@ -52,44 +60,57 @@ wss.on('connection', (ws, req) => {
       const parsedMessage = JSON.parse(message);
       const { type, senderId, receiverId, text } = parsedMessage;
 
+      // --- REGISTER USER ---
       if (type === 'register') {
-        // Add to the Set of sockets for this user
         if (!clients.has(senderId)) {
           clients.set(senderId, new Set());
         }
         clients.get(senderId).add(ws);
         
-        // Tag the socket with the userId for cleanup later
+        // Tag the socket for cleanup
         ws.userId = senderId;
         return;
       }
 
+      // --- HANDLE MESSAGE ---
       if (type === 'message') {
-        const newMessage = new Message({ senderId, receiverId, text });
+        // 1. SAVE TO DATABASE (Crucial Step)
+        const newMessage = new Message({ 
+          senderId, 
+          receiverId, 
+          text,
+          timestamp: new Date() 
+        });
+        
         await newMessage.save();
+        console.log(`💾 Message saved: ${newMessage._id} from ${senderId}`);
 
-        // 1. Send to ALL of Receiver's active sockets
-        const receiverSockets = clients.get(receiverId);
-        if (receiverSockets) {
+        // 2. SEND TO RECEIVER (if online)
+        if (clients.has(receiverId)) {
+          const receiverSockets = clients.get(receiverId);
           const payload = JSON.stringify({
             senderId,
             text,
-            timestamp: newMessage.timestamp
+            timestamp: newMessage.timestamp,
+            isSelf: false
           });
+          
           receiverSockets.forEach(socket => {
-            if (socket.readyState === 1) {
+            if (socket.readyState === 1) { // WebSocket.OPEN
               socket.send(payload);
             }
           });
         }
 
-        // 2. Send confirmation to the Sender's specific socket (that sent this)
-        ws.send(JSON.stringify({
-          senderId,
-          text,
-          timestamp: newMessage.timestamp,
-          isSelf: true 
-        }));
+        // 3. SEND CONFIRMATION TO SENDER (for UI updates)
+        if (ws.readyState === 1) {
+            ws.send(JSON.stringify({
+              senderId,
+              text,
+              timestamp: newMessage.timestamp,
+              isSelf: true 
+            }));
+        }
       }
     } catch (error) {
       console.error('WebSocket Error:', error);
@@ -97,7 +118,7 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    // Cleanup: Remove this specific socket from the user's Set
+    // Cleanup: Remove this socket from the user's Set
     if (ws.userId && clients.has(ws.userId)) {
       const userSockets = clients.get(ws.userId);
       userSockets.delete(ws);
