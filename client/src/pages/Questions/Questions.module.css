@@ -3,11 +3,11 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh; 
-  /* UPDATED: Match Home Page Container */
+  /* CHANGED: Use 100% to fit the parent App container, preventing overflow */
+  height: 100%; 
   background-color: #ffffff; 
   overflow: hidden; 
+  position: relative;
 }
 
 /* --- Header & Progress --- */
@@ -17,7 +17,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex-shrink: 0; 
-  background-color: #ffffff; /* Ensure header is clean white */
+  background-color: #ffffff; 
 }
 
 .progressBar {
@@ -29,13 +29,13 @@
 
 .progressSegment {
   flex: 1;
-  background-color: #f3f4f6; /* Lighter grey for better contrast on white */
+  background-color: #f3f4f6; 
   border-radius: 10px;
   transition: background-color 0.4s ease;
 }
 
 .activeSegment {
-  background-color: #ff4b6e; /* Hardcoded primary pink for consistency */
+  background-color: #ff4b6e; 
 }
 
 /* --- Main Content --- */
@@ -46,9 +46,10 @@
   display: flex;
   flex-direction: column;
   scroll-behavior: smooth; 
-  
-  /* UPDATED: Match Home Page Content Background */
   background-color: #f8f9fa; 
+  
+  /* Add padding bottom to ensure last element isn't hidden behind footer visually if scrolled */
+  padding-bottom: 2rem;
 }
 
 .questionTitle {
@@ -73,7 +74,6 @@
 }
 
 .optionCard {
-  /* UPDATED: White card on off-white background */
   background: #ffffff; 
   border: 2px solid transparent;
   border-radius: 16px;
@@ -85,7 +85,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* Subtle shadow */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
   font-family: inherit;
 }
 
@@ -125,12 +125,10 @@
 /* --- Footer --- */
 .footer {
   padding: 1.5rem;
-  /* UPDATED: Match Home Page Footer/Nav */
   background: #ffffff; 
   flex-shrink: 0; 
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(0,0,0,0.02); /* Subtle separator */
-  /* Added z-index to ensure it sits above content */
+  border-top: 1px solid rgba(0,0,0,0.02); 
   position: relative;
   z-index: 10;
 }
@@ -150,7 +148,6 @@
 }
 
 .activeButton {
-  /* CHANGED: Solid pink background so white text is visible */
   background: #ff4b6e;
   color: white;
   cursor: pointer;

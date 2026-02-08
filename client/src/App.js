@@ -15,12 +15,16 @@ import Terms from './pages/Terms/Terms';
 // Layout component to handle conditional scrolling
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isChat = location.pathname === '/chat';
+  
+  // Define routes that should NOT scroll at the window level
+  // (because they handle their own internal scrolling)
+  const lockScrollRoutes = ['/chat', '/questions'];
+  const shouldLockScroll = lockScrollRoutes.includes(location.pathname);
 
   return (
     <div 
       className={`w-full max-w-[430px] h-full bg-white shadow-2xl relative ${
-        isChat ? 'overflow-hidden' : 'overflow-y-auto'
+        shouldLockScroll ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
     >
       {children}
