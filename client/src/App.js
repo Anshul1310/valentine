@@ -12,14 +12,14 @@ import Home from './pages/Home/Home';
 import Chat from './pages/Chat/Chat';
 import Terms from './pages/Terms/Terms';
 
-// Create a Layout component to handle conditional styles based on route
+// Layout component to handle conditional scrolling
 const Layout = ({ children }) => {
   const location = useLocation();
   const isChat = location.pathname === '/chat';
 
   return (
     <div 
-      className={`w-full max-w-[430px] h-full bg-white shadow-2xl relative overflow-x-hidden ${
+      className={`w-full max-w-[430px] h-full bg-white shadow-2xl relative ${
         isChat ? 'overflow-hidden' : 'overflow-y-auto'
       }`}
     >

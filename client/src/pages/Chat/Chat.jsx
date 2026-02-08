@@ -25,11 +25,13 @@ const Chat = () => {
   const [hasMore, setHasMore] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0); 
   
-  const messagesEndRef = useRef(null);
+  // Ref for the specific scrollable container
   const chatContainerRef = useRef(null);
   const mainContainerRef = useRef(null);
   const ws = useRef(null); 
   const isFetchingRef = useRef(false);
+  // kept for structure, but we won't scroll to it directly anymore
+  const messagesEndRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,7 +55,6 @@ const Chat = () => {
   const currentUserId = getCurrentUserId();
   const chatUserId = targetUser?._id; 
 
-  // UPDATED: Use the avatar from the targetUser object if available
   const getAvatarUrl = () => {
     if (targetUser?.avatar) return targetUser.avatar;
     return `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`;
@@ -63,6 +64,18 @@ const Chat = () => {
     name: targetUser?.name || "Unknown",
     status: "Online",
     avatar: getAvatarUrl()
+  };
+
+  // --- CRITICAL FIX: Use scrollTop instead of scrollIntoView ---
+  const scrollToBottom = (behavior = "auto") => {
+    if (chatContainerRef.current) {
+      const { scrollHeight, clientHeight } = chatContainerRef.current;
+      // Scroll strictly within this container, never affecting the parent window
+      chatContainerRef.current.scrollTo({
+        top: scrollHeight - clientHeight,
+        behavior: behavior
+      });
+    }
   };
 
   const fetchHistory = useCallback(async (beforeTimestamp = null) => {
@@ -101,6 +114,7 @@ const Chat = () => {
       if (!beforeTimestamp) {
         setMessages(formattedMessages);
         setUnreadCount(count);
+        // Small delay to ensure DOM is rendered before scrolling
         setTimeout(() => scrollToBottom("auto"), 100);
       } else {
         const container = chatContainerRef.current;
@@ -127,10 +141,6 @@ const Chat = () => {
     fetchHistory();
   }, [fetchHistory]);
 
-  const scrollToBottom = (behavior = "auto") => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
-  };
-
   const handleScroll = async () => {
     const container = chatContainerRef.current;
     if (!container) return;
@@ -150,7 +160,7 @@ const Chat = () => {
       
       if (chatContainerRef.current) {
           const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-          const isAtBottom = scrollHeight - scrollTop === clientHeight;
+          const isAtBottom = scrollHeight - scrollTop <= clientHeight + 50; // Added small buffer
           if(isAtBottom) scrollToBottom("auto");
       }
     };
