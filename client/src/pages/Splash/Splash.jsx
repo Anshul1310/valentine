@@ -1,5 +1,5 @@
 // client/src/pages/Splash/Splash.jsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Lottie from 'lottie-react';
@@ -10,27 +10,53 @@ import animationData from './animation.json';
 
 const Splash = () => {
   const navigate = useNavigate();
+  const [installPrompt, setInstallPrompt] = useState(null);
 
+  // 1. Listen for the 'Add to Home Screen' event
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setInstallPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    // Show the install prompt
+    installPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await installPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, so clear it
+    setInstallPrompt(null);
+  };
+
+  // 2. Navigation Logic
   useEffect(() => {
     const checkStatus = async () => {
-      // 1. Check for token immediately
       const token = localStorage.getItem('authToken');
 
       // Helper to handle the navigation delay
       const delayedNavigate = (path) => {
         setTimeout(() => {
           navigate(path);
-        }, 2500); // 2.5s delay to let animation play
+        }, 2500); 
       };
 
       if (!token) {
-        // No token found? Go to Onboarding start
         delayedNavigate('/onboarding');
         return;
       }
 
       try {
-        // 2. Verify token and check onboarding status
         const res = await axios.get('/api/user/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -38,15 +64,12 @@ const Splash = () => {
         const { onboardingComplete } = res.data;
 
         if (onboardingComplete) {
-          // If setup is done, show Terms before Home
-          delayedNavigate('/terms');
+          delayedNavigate('/terms'); // Or /home based on your flow
         } else {
-          // If setup is incomplete, skip Gender and go strictly to Questions
           delayedNavigate('/questions');
         }
 
       } catch (error) {
-        // If token is invalid or server error, reset and go to Onboarding
         console.error("Session check failed:", error);
         localStorage.removeItem('authToken');
         delayedNavigate('/onboarding');
@@ -57,7 +80,7 @@ const Splash = () => {
   }, [navigate]);
 
   return (
-    <Lottie 
+     <Lottie 
           animationData={animationData} 
           loop={true} 
           className={styles.lottiePlayer}

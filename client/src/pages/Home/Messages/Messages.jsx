@@ -29,11 +29,14 @@ const Messages = () => {
   }, []);
 
   const handleChatClick = (user) => {
+    // We pass the full user object (including their custom avatar) to the Chat screen
     navigate('/chat', { state: { chatUser: user } });
   };
 
-  const getAvatar = (name) => {
-    const seed = name || 'User';
+  // UPDATED: Use the DB avatar if it exists, otherwise fallback to name-generation
+  const getAvatar = (user) => {
+    if (user.avatar) return user.avatar;
+    const seed = user.name || 'User';
     return `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&flip=true`;
   };
 
@@ -69,7 +72,7 @@ const Messages = () => {
               onClick={() => handleChatClick(user)}
             >
               <img 
-                src={getAvatar(user.name)} 
+                src={getAvatar(user)} 
                 alt={user.name} 
                 className={styles.chatAvatar} 
               />

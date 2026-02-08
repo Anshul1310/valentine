@@ -7,21 +7,21 @@ import styles from './Onboarding.module.css';
 const slides = [
   {
     id: 1,
-    image: "https://cdn3d.iconscout.com/3d/premium/thumb/couple-in-love-5462557-4550672.png", // 3D Couple illustration
+    image: "https://res.cloudinary.com/dbxtgjwyv/image/upload/v1770531802/one_rbhl9j.png", // 3D Couple illustration
     title: "Find your partner with us",
-    desc: "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint."
+    desc: "We know it can be shy to socialize with the opposite gender. That's exactly why we built the perfect solution for you."
   },
   {
     id: 2,
-    image: "https://cdn3d.iconscout.com/3d/premium/thumb/chatting-couple-2937684-2426384.png", 
+    image: "https://res.cloudinary.com/dbxtgjwyv/image/upload/v1770531802/two_hpve6q.png", 
     title: "Chat instantly with matches",
     desc: "Connect with people who share your interests and vibe instantly."
   },
   {
     id: 3,
-    image: "https://cdn3d.iconscout.com/3d/premium/thumb/dating-app-match-2937691-2426391.png", 
-    title: "It's a Match!",
-    desc: "Start your journey today and find the one you've been looking for."
+    image: "https://res.cloudinary.com/dbxtgjwyv/image/upload/v1770532337/three_s3elmm.png", 
+    title: "End to End encrypted chats!",
+    desc: "Don't worry for your messages, We have your back with end to end encryption for messages"
   }
 ];
 

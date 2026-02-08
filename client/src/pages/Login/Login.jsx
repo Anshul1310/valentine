@@ -28,7 +28,7 @@ const Login = () => {
           <div className={styles.logoBg}>
             <span className={styles.logoEmoji}>🔥</span>
           </div>
-          <h1 className={styles.appName}>MATCHED</h1>
+          <h1 className={styles.appName}>BenchBae</h1>
           <p className={styles.tagline}>Find your spark at NITT</p>
         </div>
 

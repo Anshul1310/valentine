@@ -1,8 +1,9 @@
+/* client/src/pages/Home/Profile/Profile.module.css */
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* Updated background to match Confessions */
   background: linear-gradient(135deg, #fff5f7 0%, #fff0f5 50%, #f0f7ff 100%);
   overflow-y: auto;
   padding-bottom: 90px;
@@ -10,21 +11,21 @@
 
 /* --- Header Card --- */
 .headerCard {
-  background: var(--main-gradient);
+  background: var(--main-gradient, linear-gradient(135deg, #ff4b6e, #ff8da1));
   padding: 50px 20px 40px;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--white);
-  box-shadow: var(--shadow-glow);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
 }
 
 .largeAvatar {
   width: 130px;
   height: 130px;
-  background-color: var(--surface-color);
+  background-color: #ffffff;
   border-radius: 50%;
   border: 4px solid rgba(255, 255, 255, 0.4);
   margin-bottom: 16px;
@@ -61,7 +62,7 @@
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #111;
   margin-bottom: 16px;
 }
 
@@ -73,7 +74,7 @@
 .inputLabel {
   display: block;
   font-size: 12px;
-  color: var(--text-light);
+  color: #888;
   margin-bottom: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -85,18 +86,17 @@
   padding: 18px;
   font-size: 16px;
   border: 2px solid transparent;
-  border-radius: var(--border-radius-md);
+  border-radius: 12px;
   font-family: inherit;
   transition: all 0.2s;
   outline: none;
-  background-color: var(--surface-color);
-  color: var(--text-dark);
-  box-shadow: var(--shadow-sm);
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .nicknameInput:focus {
-  border-color: var(--primary-color);
-  background-color: var(--surface-color);
+  border-color: #ff4b6e;
 }
 
 /* Tabs */
@@ -115,16 +115,16 @@
   text-align: center;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-medium);
+  color: #666;
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.2s;
 }
 
 .activeTab {
-  background-color: var(--surface-color);
-  color: var(--primary-color);
-  box-shadow: var(--shadow-sm);
+  background-color: #ffffff;
+  color: #ff4b6e;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 /* Avatar Grid */
@@ -138,7 +138,7 @@
   width: 75px;
   height: 75px;
   border-radius: 50%;
-  background-color: var(--surface-color);
+  background-color: #ffffff;
   border: 3px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
@@ -146,7 +146,7 @@
 }
 
 .selectedAvatar {
-  border-color: var(--primary-color);
+  border-color: #ff4b6e;
   background-color: #fff0f3;
   transform: scale(1.1);
   box-shadow: 0 5px 15px rgba(255, 75, 110, 0.2);
@@ -163,18 +163,43 @@
   margin-top: 40px;
   width: 100%;
   padding: 18px;
-  background: var(--main-gradient);
-  color: var(--white);
+  background: var(--main-gradient, linear-gradient(135deg, #ff4b6e, #ff8da1));
+  color: #ffffff;
   border: none;
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
   transition: transform 0.1s;
-  font-family: var(--font-family);
+  font-family: inherit;
 }
 
 .saveButton:active {
+  transform: scale(0.98);
+}
+
+/* --- Support Button (Secondary Style) --- */
+.supportButton {
+  margin-top: 15px;
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.supportButton:active {
+  background-color: #f3f4f6;
   transform: scale(0.98);
 }

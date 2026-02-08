@@ -1,3 +1,4 @@
+// client/src/pages/Home/Profile/Profile.jsx
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 
@@ -21,7 +22,6 @@ const Profile = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch current random nickname/avatar on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -33,7 +33,7 @@ const Profile = () => {
         
         if (data.name) setNickname(data.name);
         if (data.avatar) setSelectedAvatar(data.avatar);
-        else setSelectedAvatar(AVATAR_OPTIONS.boys[0]); // Fallback
+        else setSelectedAvatar(AVATAR_OPTIONS.boys[0]); 
         
         setLoading(false);
       } catch (err) {
@@ -71,6 +71,11 @@ const Profile = () => {
     }
   };
 
+  // --- NEW SUPPORT HANDLER ---
+  const handleSupport = () => {
+    window.open('https://wa.me/916395390703', '_blank');
+  };
+
   if (loading) return <div className={styles.container}>Loading...</div>;
 
   return (
@@ -86,7 +91,6 @@ const Profile = () => {
       {/* 2. Edit Form Section */}
       <div className={styles.editSection}>
         
-        {/* Nickname Input */}
         <div className={styles.inputGroup}>
           <label className={styles.inputLabel}>DISPLAY NAME</label>
           <input 
@@ -99,12 +103,10 @@ const Profile = () => {
           />
         </div>
 
-        {/* Avatar Selection */}
         <div className={styles.sectionTitle}>
           <span>Choose Avatar</span>
         </div>
 
-        {/* Tabs for Boys/Girls */}
         <div className={styles.tabs}>
           <div 
             className={`${styles.tab} ${activeTab === 'boys' ? styles.activeTab : ''}`}
@@ -120,7 +122,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* The Grid */}
         <div className={styles.avatarGrid}>
           {AVATAR_OPTIONS[activeTab].map((url, index) => (
             <div 
@@ -136,6 +137,11 @@ const Profile = () => {
         {/* Save Button */}
         <button className={styles.saveButton} onClick={handleSave}>
           {isSaved ? "Saved Successfully! 🎉" : "Save Changes"}
+        </button>
+
+        {/* --- NEW SUPPORT BUTTON --- */}
+        <button className={styles.supportButton} onClick={handleSupport}>
+          Need Help? Chat on WhatsApp 💬
         </button>
 
       </div>

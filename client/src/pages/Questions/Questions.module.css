@@ -1,11 +1,12 @@
+/* client/src/pages/Questions/Questions.module.css */
+
 .container {
   display: flex;
   flex-direction: column;
-  /* Use dvh to account for mobile browser address bars */
   height: 100vh;
   height: 100dvh; 
-  background-color: var(--bg-color);
-  /* Prevent the container itself from scrolling */
+  /* UPDATED: Match Home Page Container */
+  background-color: #ffffff; 
   overflow: hidden; 
 }
 
@@ -15,8 +16,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  /* Ensure header doesn't shrink */
   flex-shrink: 0; 
+  background-color: #ffffff; /* Ensure header is clean white */
 }
 
 .progressBar {
@@ -28,38 +29,39 @@
 
 .progressSegment {
   flex: 1;
-  background-color: #e5e7eb;
+  background-color: #f3f4f6; /* Lighter grey for better contrast on white */
   border-radius: 10px;
   transition: background-color 0.4s ease;
 }
 
 .activeSegment {
-  background-color: var(--primary-color);
+  background-color: #ff4b6e; /* Hardcoded primary pink for consistency */
 }
 
 /* --- Main Content --- */
 .content {
   flex: 1;
   padding: 1rem 1.5rem;
-  /* Scroll happens HERE, inside the flex item */
   overflow-y: auto; 
   display: flex;
   flex-direction: column;
-  /* Smooth scroll for better UX */
   scroll-behavior: smooth; 
+  
+  /* UPDATED: Match Home Page Content Background */
+  background-color: #f8f9fa; 
 }
 
 .questionTitle {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #111;
   margin-bottom: 0.5rem;
   line-height: 1.25;
 }
 
 .questionDescription {
   font-size: 1rem;
-  color: var(--text-medium);
+  color: #666;
   margin-bottom: 2rem;
 }
 
@@ -71,26 +73,27 @@
 }
 
 .optionCard {
-  background: var(--surface-color);
+  /* UPDATED: White card on off-white background */
+  background: #ffffff; 
   border: 2px solid transparent;
-  border-radius: var(--border-radius-md);
+  border-radius: 16px;
   padding: 1.25rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: #333;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-shadow: var(--shadow-sm);
-  font-family: var(--font-family);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* Subtle shadow */
+  font-family: inherit;
 }
 
 .selectedOption {
-  border-color: var(--primary-color);
+  border-color: #ff4b6e;
   background-color: #fff0f3;
-  color: var(--primary-color);
-  box-shadow: var(--shadow-glow);
+  color: #ff4b6e;
+  box-shadow: 0 4px 12px rgba(255, 75, 110, 0.15);
 }
 
 /* --- Text Input --- */
@@ -99,55 +102,55 @@
   min-height: 180px;
   padding: 1.25rem;
   font-size: 1.1rem;
-  color: var(--text-dark);
-  background-color: var(--surface-color);
+  color: #333;
+  background-color: #ffffff;
   border: 2px solid transparent;
-  border-radius: var(--border-radius-md);
+  border-radius: 16px;
   resize: none;
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .textArea:focus {
-  border-color: var(--primary-color);
+  border-color: #ff4b6e;
   box-shadow: 0 0 0 4px rgba(255, 75, 110, 0.1);
 }
 
 .textArea::placeholder {
-  color: var(--text-light);
+  color: #9ca3af;
 }
 
 /* --- Footer --- */
 .footer {
   padding: 1.5rem;
-  background: var(--bg-color); 
-  /* Prevent footer from shrinking */
+  /* UPDATED: Match Home Page Footer/Nav */
+  background: #ffffff; 
   flex-shrink: 0; 
-  /* Add safe area for iPhones without home button */
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(0,0,0,0.02); /* Subtle separator */
 }
 
 .nextButton {
   width: 100%;
   padding: 1.2rem;
   border: none;
-  border-radius: var(--border-radius-lg);
-  background-color: #e5e7eb;
-  color: var(--text-light);
+  border-radius: 20px;
+  background-color: #f3f4f6;
+  color: #9ca3af;
   font-size: 1rem;
   font-weight: 700;
   cursor: not-allowed;
   transition: all 0.3s ease;
-  font-family: var(--font-family);
+  font-family: inherit;
 }
 
 .activeButton {
-  background: var(--main-gradient);
-  color: var(--white);
+  background: linear-gradient(135deg,#fff5f7,#fff0f5 50%,#f0f7ff);
+  color: white;
   cursor: pointer;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
 }
 
 .activeButton:active {

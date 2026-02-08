@@ -6,17 +6,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--main-gradient);
+  /* Use a fallback background if variable isn't defined, or keep var(--main-gradient) */
+  background: var(--main-gradient, linear-gradient(135deg, #ff4b6e 0%, #ff8da1 100%));
+  position: relative;
 }
 
 .lottieBox {
-  width: 250px; /* Adjusted size for better visibility of animation */
+  width: 250px; 
   height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Removed border-radius, box-shadow, and pulse animation 
-     so the Lottie animation renders cleanly */
 }
 
 .lottiePlayer {
@@ -25,11 +25,37 @@
 }
 
 .title {
-  color: var(--white);
+  color: #ffffff;
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 3px;
   margin-top: 1rem;
   text-transform: uppercase;
   text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Install Button Styles */
+.installBtn {
+  margin-top: 2rem;
+  padding: 12px 28px;
+  background-color: white;
+  color: #ff4b6e;
+  border: none;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 100;
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: transform 0.2s ease;
+}
+
+.installBtn:active {
+  transform: scale(0.95);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.5) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }

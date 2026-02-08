@@ -53,10 +53,16 @@ const Chat = () => {
   const currentUserId = getCurrentUserId();
   const chatUserId = targetUser?._id; 
 
+  // UPDATED: Use the avatar from the targetUser object if available
+  const getAvatarUrl = () => {
+    if (targetUser?.avatar) return targetUser.avatar;
+    return `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`;
+  };
+
   const chatUserDisplay = {
     name: targetUser?.name || "Unknown",
     status: "Online",
-    avatar: `https://api.dicebear.com/9.x/adventurer/svg?seed=${targetUser?.name || 'User'}&flip=true`
+    avatar: getAvatarUrl()
   };
 
   const fetchHistory = useCallback(async (beforeTimestamp = null) => {
@@ -167,7 +173,6 @@ const Chat = () => {
   useEffect(() => {
     if (!chatUserId || !currentUserId) return;
 
-    // Use Dynamic URL
     ws.current = new WebSocket(WS_URL);
     
     ws.current.onopen = () => {
