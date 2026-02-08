@@ -3,22 +3,21 @@
 .container {
   display: flex;
   flex-direction: column;
-  /* Fill the App container exactly */
-  height: 100%;
+  /* Force the container to take exactly the full dynamic screen height */
+  height: 100dvh; 
   width: 100%;
   background-color: #ffffff;
-  overflow: hidden; /* Prevent the container itself from scrolling */
+  overflow: hidden; /* Prevent the whole page from scrolling */
   position: relative;
 }
 
-/* --- Header --- */
-/* Stays fixed at the top */
+/* --- Fixed Header --- */
 .header {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  flex-shrink: 0; 
+  flex-shrink: 0; /* Prevents header from shrinking */
   background-color: #ffffff;
   z-index: 10;
 }
@@ -41,20 +40,17 @@
   background-color: #ff4b6e;
 }
 
-/* --- Main Content (SCROLLABLE AREA) --- */
+/* --- Scrollable Middle Section --- */
 .content {
-  flex: 1; /* Grow to fill all available space between header and footer */
+  flex: 1; /* Takes up all remaining space */
+  overflow-y: auto; /* Enables vertical scrolling ONLY here */
   padding: 1rem 1.5rem;
-  
-  /* This makes ONLY this section scroll */
-  overflow-y: auto; 
-  
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
   
-  /* Add padding at bottom so content doesn't touch the edge when scrolled */
-  padding-bottom: 2rem;
+  /* Add padding at bottom to ensure content doesn't get cut off visually */
+  padding-bottom: 20px;
 }
 
 .questionTitle {
@@ -123,27 +119,19 @@
   box-shadow: 0 0 0 4px rgba(255, 75, 110, 0.1);
 }
 
-.textArea::placeholder {
-  color: #9ca3af;
-}
-
-/* --- Footer (FIXED AT BOTTOM) --- */
+/* --- Fixed Footer --- */
 .footer {
   padding: 1.5rem;
   background: #ffffff;
+  flex-shrink: 0; /* Prevents footer from shrinking or disappearing */
   
-  /* Prevent footer from shrinking */
-  flex-shrink: 0; 
-  
-  /* Ensure it sits above content */
-  z-index: 20;
-  
-  /* Visual separation */
-  border-top: 1px solid rgba(0,0,0,0.02);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
-  
-  /* Handle iPhone Home Bar */
+  /* Safe area for iPhone home bar */
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  
+  border-top: 1px solid rgba(0,0,0,0.05);
+  z-index: 50; /* High z-index to stay on top */
+  position: relative;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
 }
 
 .nextButton {
