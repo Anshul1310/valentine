@@ -130,6 +130,9 @@
   flex-shrink: 0; 
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   border-top: 1px solid rgba(0,0,0,0.02); /* Subtle separator */
+  /* Added z-index to ensure it sits above content */
+  position: relative;
+  z-index: 10;
 }
 
 .nextButton {
@@ -147,7 +150,8 @@
 }
 
 .activeButton {
-  background: linear-gradient(135deg,#fff5f7,#fff0f5 50%,#f0f7ff);
+  /* CHANGED: Solid pink background so white text is visible */
+  background: #ff4b6e;
   color: white;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(255, 75, 110, 0.3);
