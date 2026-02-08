@@ -5,13 +5,13 @@ import styles from './Profile.module.css';
 // 10 Boys & 10 Girls (DiceBear Adventurer seeds)
 const AVATAR_OPTIONS = {
   boys: [
-    'Felix', 'Aneka', 'Jack', 'Oliver', 'Max', 
-    'Leo', 'Ryan', 'Ethan', 'Caleb', 'Liam'
+    'Felix', 'Aneka', 'Oliver', 'Max', 
+    , 'Ryan', 'Ethan', 'Liam'
   ].map(seed => `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&flip=true`),
   
   girls: [
-    'Lisa', 'Annie', 'Zoe', 'Mila', 'Ruby', 
-    'Sara', 'Bella', 'Maya', 'Nora', 'Eva'
+    'Lisa', 'Zoe', 'Mila', 'Ruby', 
+     'Bella', 'Maya', 'Nora', 'Eva'
   ].map(seed => `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`)
 };
 
