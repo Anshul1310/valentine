@@ -1,3 +1,4 @@
+// client/src/pages/Login/Login.jsx
 import { useEffect, useState } from 'react';
 import styles from './Login.module.css';
 
@@ -12,9 +13,11 @@ const Login = () => {
     const CLIENT_ID = process.env.REACT_APP_DAUTH_CLIENT_ID;
     const REDIRECT_URI = process.env.REACT_APP_DAUTH_REDIRECT_URI;
     const AUTH_URL = process.env.REACT_APP_DAUTH_AUTHORIZE_URL;
-    // Redirect to Delta
-    window.location.href = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`;
-  
+    
+    // FIX: Use replace() so the Login page doesn't stay in history
+    window.location.replace(
+      `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&grant_type=authorization_code&scope=email+profile+user`
+    );
   };
 
   return (

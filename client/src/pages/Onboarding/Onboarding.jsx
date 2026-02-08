@@ -34,7 +34,7 @@ const Onboarding = () => {
       setCurrentIndex(currentIndex + 1);
     } else {
       // Navigate to Auth/Login page when finished
-      navigate('/login'); 
+      navigate('/login',{ replace: true }); 
     }
   };
 

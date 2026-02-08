@@ -1,3 +1,4 @@
+// client/src/pages/Questions/Questions.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -109,8 +110,6 @@ const questionsData = [
     placeholder: "Type your answer here...",
     maxLength: 150
   },
-
-
 ];
 
 const Questions = () => {
@@ -123,17 +122,13 @@ const Questions = () => {
   const currentQuestion = questionsData[currentIndex];
   const currentAnswer = answers[currentQuestion.id];
 
-  // --- MODIFIED SECTION START ---
   // Handle Selection (Single Option Enforced)
   const handleSelect = (option) => {
     setAnswers(prev => ({
       ...prev,
-      // We set the value to a new array containing ONLY the selected option.
-      // This overwrites any previous selection.
       [currentQuestion.id]: [option]
     }));
   };
-  // --- MODIFIED SECTION END ---
 
   // Handle Text Input (String)
   const handleTextChange = (e) => {
@@ -174,6 +169,7 @@ const Questions = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
+        // FIX: Using replace: true to prevent going back to Questions
         navigate('/terms', { replace: true });
 
       } catch (error) {

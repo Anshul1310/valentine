@@ -1,5 +1,5 @@
 // client/src/pages/Splash/Splash.jsx
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Lottie from 'lottie-react';
@@ -10,36 +10,8 @@ import animationData from './animation.json';
 
 const Splash = () => {
   const navigate = useNavigate();
-  const [installPrompt, setInstallPrompt] = useState(null);
 
-  // 1. Listen for the 'Add to Home Screen' event
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setInstallPrompt(e);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!installPrompt) return;
-    // Show the install prompt
-    installPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const { outcome } = await installPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    // We've used the prompt, so clear it
-    setInstallPrompt(null);
-  };
-
-  // 2. Navigation Logic
+  // Navigation Logic
   useEffect(() => {
     const checkStatus = async () => {
       const token = localStorage.getItem('authToken');
@@ -47,7 +19,8 @@ const Splash = () => {
       // Helper to handle the navigation delay
       const delayedNavigate = (path) => {
         setTimeout(() => {
-          navigate(path);
+          // Using replace: true prevents the user from going back to Splash
+          navigate(path, { replace: true });
         }, 2500); 
       };
 
@@ -64,7 +37,7 @@ const Splash = () => {
         const { onboardingComplete } = res.data;
 
         if (onboardingComplete) {
-          delayedNavigate('/terms'); // Or /home based on your flow
+          delayedNavigate('/terms'); 
         } else {
           delayedNavigate('/questions');
         }

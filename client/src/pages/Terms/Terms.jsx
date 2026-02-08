@@ -1,4 +1,4 @@
-// src/pages/Terms/Terms.jsx
+// client/src/pages/Terms/Terms.jsx
 import { useNavigate } from 'react-router-dom';
 import styles from './Terms.module.css';
 
@@ -6,7 +6,7 @@ const Terms = () => {
   const navigate = useNavigate();
 
   const handleAgree = () => {
-    // Navigate to the next step: Questions or Gender Select
+    // FIX: Using replace: true to prevent going back to Terms
     navigate('/home', { replace: true }); 
   };
 
