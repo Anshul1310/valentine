@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Confession = require('../models/Confession');
+const ReportedConfession = require('../models/ReportedConfession');
 
 // GET /api/confessions/quota
 exports.getQuota = async (req, res) => {
@@ -132,5 +133,43 @@ exports.commentConfession = async (req, res) => {
   } catch (error) {
     console.error("Comment Error:", error);
     res.status(500).json({ message: "Error commenting" });
+  }
+};
+
+// POST /api/confessions/:id/report
+exports.reportConfession = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const confessionId = req.params.id;
+    const userId = req.user.id;
+
+    // Check if the confession exists
+    const confession = await Confession.findById(confessionId);
+    if (!confession) {
+      return res.status(404).json({ message: "Confession not found" });
+    }
+
+    // Check if already reported by this user
+    const existingReport = await ReportedConfession.findOne({ 
+      confession: confessionId, 
+      reporter: userId 
+    });
+
+    if (existingReport) {
+      return res.status(400).json({ message: "You have already reported this confession." });
+    }
+
+    const newReport = new ReportedConfession({
+      confession: confessionId,
+      reporter: userId,
+      reason: reason || "Inappropriate content"
+    });
+
+    await newReport.save();
+    res.status(201).json({ message: "Report submitted successfully." });
+
+  } catch (error) {
+    console.error("Report Error:", error);
+    res.status(500).json({ message: "Error submitting report" });
   }
 };

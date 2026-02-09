@@ -99,6 +99,26 @@ const Confessions = () => {
     setOpenComments(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  // --- Report Functionality ---
+  const handleReport = async (id) => {
+    const reason = prompt("Why are you reporting this confession?");
+    
+    if (reason === null) return; // User cancelled
+
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.post(`/api/confessions/${id}/report`, 
+        { reason: reason || "Inappropriate content" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      alert("Report submitted. Thank you for helping keep the community safe.");
+    } catch (error) {
+      const msg = error.response?.data?.message || "Failed to report confession.";
+      alert(msg);
+    }
+  };
+
   if (loading) return <div className={styles.loading}>Loading Secrets... 🤫</div>;
 
   return (
@@ -154,6 +174,27 @@ const Confessions = () => {
                 onClick={() => toggleComments(post._id)}
               >
                 💬 {post.commentsCount}
+              </button>
+
+              {/* NEW: Text-based Report Button */}
+              <button 
+                className={styles.reportBtn}
+                onClick={() => handleReport(post._id)}
+                title="Report this confession"
+                style={{ 
+                  marginLeft: 'auto', 
+                  background: 'rgba(255, 255, 255, 0.1)', 
+                  border: '1px solid rgba(255, 255, 255, 0.2)', 
+                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  cursor: 'pointer', 
+                  color: '#ffdddd',
+                  fontSize: '0.75rem',
+                  fontWeight: '500',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                REPORT
               </button>
             </div>
 
