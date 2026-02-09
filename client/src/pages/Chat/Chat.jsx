@@ -194,6 +194,9 @@ const Chat = () => {
       const isSelf = (data.senderId === currentUserId);
       if (isSelf) return; 
 
+      // ✅ FIX: Only accept messages from the user we are currently chatting with
+      if (data.senderId !== chatUserId) return;
+
       const newMessage = {
         id: Date.now(),
         text: data.text,
