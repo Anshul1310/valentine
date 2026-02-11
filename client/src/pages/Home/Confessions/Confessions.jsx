@@ -8,20 +8,24 @@ const Confessions = () => {
   const [quota, setQuota] = useState(0);
   const [loading, setLoading] = useState(true);
   
+  // 'popular' or 'recent'
+  const [filter, setFilter] = useState('popular'); 
+
   const [openComments, setOpenComments] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [filter]); // Re-fetch when filter changes
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('authToken');
       const headers = { Authorization: `Bearer ${token}` };
 
       const [feedRes, quotaRes] = await Promise.all([
-        axios.get('/api/confessions', { headers }),
+        axios.get(`/api/confessions?sortBy=${filter}`, { headers }),
         axios.get('/api/confessions/quota', { headers })
       ]);
 
@@ -53,7 +57,7 @@ const Confessions = () => {
   };
 
   const handleLike = async (id) => {
-    // Optimistic UI Update (Instant Feedback)
+    // Optimistic UI Update
     setConfessions(prev => prev.map(post => {
       if (post._id === id) {
         return {
@@ -70,8 +74,8 @@ const Confessions = () => {
       await axios.put(`/api/confessions/${id}/like`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Background refresh to ensure sync
-      fetchData();
+      // Silent refresh to sync sort order if needed, 
+      // but usually better to leave it to avoid jumping UI
     } catch (error) {
       console.error("Like failed");
     }
@@ -99,11 +103,9 @@ const Confessions = () => {
     setOpenComments(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // --- Report Functionality ---
   const handleReport = async (id) => {
     const reason = prompt("Why are you reporting this confession?");
-    
-    if (reason === null) return; // User cancelled
+    if (reason === null) return; 
 
     try {
       const token = localStorage.getItem('authToken');
@@ -111,24 +113,39 @@ const Confessions = () => {
         { reason: reason || "Inappropriate content" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      alert("Report submitted. Thank you for helping keep the community safe.");
+      alert("Report submitted.");
     } catch (error) {
-      const msg = error.response?.data?.message || "Failed to report confession.";
+      const msg = error.response?.data?.message || "Failed to report.";
       alert(msg);
     }
   };
 
-  if (loading) return <div className={styles.loading}>Loading Secrets... 🤫</div>;
-
   return (
     <div className={styles.container}>
-      {/* Sticky Glass Header */}
+      {/* Sticky Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Confessions 🎭</h1>
-        <div className={styles.quotaBox}>
-          <span className={styles.quotaCount}>{quota}</span>
-          <span className={styles.quotaLabel}>Left Today</span>
+        <div className={styles.headerTop}>
+          <h1 className={styles.title}>Confessions 🎭</h1>
+          <div className={styles.quotaBox}>
+            <span className={styles.quotaCount}>{quota}</span>
+            <span className={styles.quotaLabel}>Left</span>
+          </div>
+        </div>
+
+        {/* TABS */}
+        <div className={styles.tabs}>
+          <button 
+            className={`${styles.tab} ${filter === 'popular' ? styles.activeTab : ''}`}
+            onClick={() => setFilter('popular')}
+          >
+            Popular 🔥
+          </button>
+          <button 
+            className={`${styles.tab} ${filter === 'recent' ? styles.activeTab : ''}`}
+            onClick={() => setFilter('recent')}
+          >
+            Recent 🕒
+          </button>
         </div>
       </div>
 
@@ -136,7 +153,7 @@ const Confessions = () => {
       <div className={styles.inputCard}>
         <textarea
           className={styles.textarea}
-          placeholder={quota > 0 ? "What's on your mind? (Anonymous)" : "You've reached your daily limit. Read & Support others! ❤️"}
+          placeholder={quota > 0 ? "Share a secret..." : "Daily limit reached. ❤️"}
           value={newConfession}
           onChange={(e) => setNewConfession(e.target.value)}
           disabled={quota === 0}
@@ -149,94 +166,93 @@ const Confessions = () => {
             onClick={handlePost}
             disabled={!newConfession.trim() || quota === 0}
           >
-            Confess It
+            Post
           </button>
         </div>
       </div>
 
       {/* Feed Section */}
-      <div className={styles.feed}>
-        {confessions.map((post) => (
-          <div key={post._id} className={styles.card}>
-            <p className={styles.content}>{post.content}</p>
-            
-            <div className={styles.actions}>
-              <button 
-                className={`${styles.actionBtn} ${post.isLikedByMe ? styles.liked : ''}`}
-                onClick={() => handleLike(post._id)}
-              >
-                <span className={styles.heartIcon}>{post.isLikedByMe ? '❤️' : '🤍'}</span> 
-                {post.likesCount}
-              </button>
-              
-              <button 
-                className={styles.actionBtn}
-                onClick={() => toggleComments(post._id)}
-              >
-                💬 {post.commentsCount}
-              </button>
-
-              {/* NEW: Text-based Report Button */}
-              <button 
-                className={styles.reportBtn}
-                onClick={() => handleReport(post._id)}
-                title="Report this confession"
-                style={{ 
-                  marginLeft: 'auto', 
-                  background: 'rgba(255, 255, 255, 0.1)', 
-                  border: '1px solid rgba(255, 255, 255, 0.2)', 
-                  borderRadius: '6px',
-                  padding: '4px 10px',
-                  cursor: 'pointer', 
-                  color: '#ffdddd',
-                  fontSize: '0.75rem',
-                  fontWeight: '500',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                REPORT
-              </button>
-            </div>
-
-            {/* Comments Section */}
-            {openComments[post._id] && (
-              <div className={styles.commentSection}>
-                <div className={styles.commentList}>
-                  {post.comments.length === 0 ? (
-                    <p className={styles.noComments}>No comments yet. Be the first! 👇</p>
-                  ) : (
-                    post.comments.map((comment, i) => (
-                      <div key={i} className={styles.commentBubble}>
-                        <span className={styles.commentAuthor}>
-                          {comment.author?.gender === 'Man' ? '👦' : '👧'} {comment.author?.name}:
-                        </span>
-                        <span className={styles.commentText}>{comment.text}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <div className={styles.commentInputBox}>
-                  <input
-                    type="text"
-                    className={styles.commentInput}
-                    placeholder="Write a supportive comment..."
-                    value={commentInputs[post._id] || ""}
-                    onChange={(e) => setCommentInputs({ ...commentInputs, [post._id]: e.target.value })}
-                    onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
-                  />
-                  <button 
-                    className={styles.sendCommentBtn}
-                    onClick={() => handleComment(post._id)}
-                  >
-                    ➤
-                  </button>
-                </div>
+      {loading ? (
+        <div className={styles.loading}>Loading...</div>
+      ) : (
+        <div className={styles.feed}>
+          {confessions.map((post) => (
+            <div key={post._id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <span className={`${styles.genderTag} ${post.authorGender === 'Man' ? styles.boy : styles.girl}`}>
+                  {post.authorGender === 'Man' ? '👦 Boy' : '👧 Girl'}
+                </span>
+                <span className={styles.date}>
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </span>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+
+              <p className={styles.content}>{post.content}</p>
+              
+              <div className={styles.actions}>
+                <button 
+                  className={`${styles.actionBtn} ${post.isLikedByMe ? styles.liked : ''}`}
+                  onClick={() => handleLike(post._id)}
+                >
+                  <span className={styles.heartIcon}>{post.isLikedByMe ? '❤️' : '🤍'}</span> 
+                  {post.likesCount}
+                </button>
+                
+                <button 
+                  className={styles.actionBtn}
+                  onClick={() => toggleComments(post._id)}
+                >
+                  💬 {post.commentsCount}
+                </button>
+
+                <button 
+                  className={styles.reportBtn}
+                  onClick={() => handleReport(post._id)}
+                >
+                  REPORT
+                </button>
+              </div>
+
+              {/* Comments Section */}
+              {openComments[post._id] && (
+                <div className={styles.commentSection}>
+                  <div className={styles.commentList}>
+                    {post.comments.length === 0 ? (
+                      <p className={styles.noComments}>No comments yet.</p>
+                    ) : (
+                      post.comments.map((comment, i) => (
+                        <div key={i} className={styles.commentBubble}>
+                          <span className={styles.commentAuthor}>
+                            {comment.author?.gender === 'Man' ? '👦' : '👧'} {comment.author?.name}:
+                          </span>
+                          <span className={styles.commentText}>{comment.text}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className={styles.commentInputBox}>
+                    <input
+                      type="text"
+                      className={styles.commentInput}
+                      placeholder="Comment..."
+                      value={commentInputs[post._id] || ""}
+                      onChange={(e) => setCommentInputs({ ...commentInputs, [post._id]: e.target.value })}
+                      onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
+                    />
+                    <button 
+                      className={styles.sendCommentBtn}
+                      onClick={() => handleComment(post._id)}
+                    >
+                      ➤
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

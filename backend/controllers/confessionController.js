@@ -16,7 +16,6 @@ exports.getQuota = async (req, res) => {
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    // Limit is set to 2 here
     const limit = 2;
     res.status(200).json({ 
       remaining: Math.max(0, limit - count),
@@ -31,17 +30,41 @@ exports.getQuota = async (req, res) => {
 // GET /api/confessions
 exports.getConfessions = async (req, res) => {
   try {
+    const { sortBy } = req.query; // 'popular' or 'recent'
+
+    // Determine sort order
+    let sortStage = { createdAt: -1 }; // Default to Recent
+    if (sortBy === 'popular') {
+      // Sort by likes, then comments, then newest
+      sortStage = { likesCount: -1, commentsCount: -1, createdAt: -1 };
+    }
+
     const confessions = await Confession.aggregate([
+      // 1. Join with Users to get author gender
       {
-        $addFields: {
-          likesCount: { $size: "$likes" },
-          commentsCount: { $size: "$comments" },
-          // Check if current user's ID is in the likes array
-          isLikedByMe: { $in: [new mongoose.Types.ObjectId(req.user.id), "$likes"] }
+        $lookup: {
+          from: 'users', 
+          localField: 'author',
+          foreignField: '_id',
+          as: 'authorDetails'
         }
       },
-      { $sort: { likesCount: -1, commentsCount: -1, createdAt: -1 } },
-      { $limit: 50 }
+      { $unwind: '$authorDetails' }, // Flatten the array
+      
+      // 2. Add calculated fields
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likes", []] } },
+          commentsCount: { $size: { $ifNull: ["$comments", []] } },
+          isLikedByMe: { $in: [new mongoose.Types.ObjectId(req.user.id), { $ifNull: ["$likes", []] }] },
+          "authorGender": "$authorDetails.gender" // Project specifically for the UI
+        }
+      },
+
+      // 3. Sort based on the tab selected
+      { $sort: sortStage }
+      
+      // Removed $limit to show all confessions
     ]);
 
     // Populate Comment Authors
@@ -67,13 +90,11 @@ exports.createConfession = async (req, res) => {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Check how many confessions the user has made today
     const count = await Confession.countDocuments({
       author: req.user.id,
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    // Enforce the limit
     if (count >= 2) {
       return res.status(403).json({ message: "Daily limit reached (2/2)." });
     }
@@ -127,7 +148,6 @@ exports.commentConfession = async (req, res) => {
 
     await confession.save();
     
-    // Return updated comments with populated author details
     const updated = await Confession.findById(req.params.id).populate('comments.author', 'name gender');
     res.status(200).json(updated.comments);
   } catch (error) {
@@ -143,13 +163,11 @@ exports.reportConfession = async (req, res) => {
     const confessionId = req.params.id;
     const userId = req.user.id;
 
-    // Check if the confession exists
     const confession = await Confession.findById(confessionId);
     if (!confession) {
       return res.status(404).json({ message: "Confession not found" });
     }
 
-    // Check if already reported by this user
     const existingReport = await ReportedConfession.findOne({ 
       confession: confessionId, 
       reporter: userId 
