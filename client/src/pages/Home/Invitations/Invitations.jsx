@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './Invitations.module.css'; // Uses same/similar styling
+import styles from './Invitations.module.css';
 
 const QUESTION_MAP = {
   2: "Ideal First Date",
@@ -19,7 +19,6 @@ const Invitations = () => {
   const fetchInvitations = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      // We reuse the same endpoint but focus on 'pending' data
       const res = await axios.get('/api/user/matches', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -51,8 +50,11 @@ const Invitations = () => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.pageTitle}>Invitations 💌</h3>
-      <p className={styles.subtitle}>People who want to match with you.</p>
+      {/* Sticky Compact Header */}
+      <div className={styles.header}>
+        <h3 className={styles.pageTitle}>Invitations 💌</h3>
+        <p className={styles.subtitle}>People who want to match with you</p>
+      </div>
 
       <div className={styles.list}>
         {pendingRequests.length === 0 ? (
@@ -84,7 +86,7 @@ const Invitations = () => {
         )}
       </div>
 
-      {/* --- REUSABLE DIALOG BOX (For Accepting) --- */}
+      {/* --- Modal --- */}
       {selectedUser && (
         <div className={styles.modalOverlay} onClick={() => setSelectedUser(null)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
@@ -93,11 +95,11 @@ const Invitations = () => {
                 {selectedUser.gender === 'Man' ? '👦' : '👧'}
               </div>
               <h2>{selectedUser.name}</h2>
-              <p>Do you want to accept their request?</p>
+              <p>Accept request?</p>
             </div>
 
             <div className={styles.modalBody}>
-              <h4 className={styles.detailsTitle}>Their Profile</h4>
+              <h4 className={styles.detailsTitle}>Profile Details</h4>
               {selectedUser.answers.filter(a => a.questionType === 'text').length > 0 ? (
                 selectedUser.answers
                   .filter(a => a.questionType === 'text')
